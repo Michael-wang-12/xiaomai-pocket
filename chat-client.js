@@ -7,6 +7,8 @@
   try{const saved=localStorage.getItem('xiaomai-reasoning');if(['low','medium','high'].includes(saved))effort=saved}catch{}
   try{const shared=new URLSearchParams(location.hash.slice(1)).get('pocket');if(shared&&/^[\w-]{32,128}$/.test(shared))sessionStorage.setItem('xiaomai-chat-access',shared);access=sessionStorage.getItem('xiaomai-chat-access')||''}catch{}
   const online=Boolean(endpoint&&access);
+  // 保持键盘与输入框焦点，避免点击档位/聊天记录时布局移动吞掉这次点击。
+  document.getElementById('composer').addEventListener('pointerdown',e=>{if(e.target.closest('button')&&document.activeElement===input)e.preventDefault()});
   const actions=new Set(['none','company','hug','five','fist','wave','thumb','laugh','encourage','night']);
   function refreshEffort(){document.querySelectorAll('[data-effort]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.effort===effort));b.disabled=busy});document.getElementById('modelControls').hidden=!online}
   document.getElementById('modelControls').onclick=e=>{const b=e.target.closest('[data-effort]');if(!b||busy)return;effort=b.dataset.effort;try{localStorage.setItem('xiaomai-reasoning',effort)}catch{}refreshEffort()};
