@@ -27,6 +27,15 @@
   function clear(){sequence++;controller?.abort();controller=null;turns=[];entries=[];setBusy(false);renderHistory();toast('本次对话已清空')}
   function history(){openSheet('和小麦聊一会儿','<p id="chatPrivacy"></p><div id="chatHistory" class="conversation-list" role="log" aria-live="polite"></div><button class="primary" id="clearConversation">清空本次对话</button>','chat-history');document.getElementById('chatPrivacy').textContent=online?'智能回复由 OpenAI 生成，可能有误。最近六轮对话和本浏览器保存的偏好会随新消息发送；刷新或关闭后聊天记录清空，保存的偏好可在「偏好记忆」单独删除。':'当前使用本机预设对话，不会发送给模型。通过智能版分享链接打开后，可以和小麦连续聊天。';document.getElementById('clearConversation').onclick=clear;renderHistory()}
   const errors={access_required:'这条智能聊天链接暂时不可用了。请向分享者获取新链接，动作和小游戏仍能玩。',not_configured:'小麦的智能聊天还在准备中，先一起玩个小游戏吧。',too_many_requests:'消息来得有点快，等一分钟再和小麦聊吧。',model_limit:'模型额度或请求量暂时受限，请稍后再试。'};
+  async function readReply(response,onPartial){
+    if(!response.ok){const error=await response.json();throw Object.assign(Error('request failed'),{code:error.error})}
+    if(!response.headers?.get('content-type')?.includes('application/x-ndjson'))return response.json();
+    let pending='',answer=null;
+    function line(raw){if(!raw.trim())return;const item=JSON.parse(raw);if(item.type==='delta'&&typeof item.text==='string'&&item.text.length<=800)onPartial(item.text);if(item.type==='done')answer=item;if(item.type==='error')throw Object.assign(Error('stream failed'),{code:item.error})}
+    if(response.body?.getReader){const reader=response.body.getReader(),decoder=new TextDecoder();try{while(true){const {value,done}=await reader.read();if(done){pending+=decoder.decode();break}pending+=decoder.decode(value,{stream:true});let end;while((end=pending.indexOf('\n'))>=0){line(pending.slice(0,end));pending=pending.slice(end+1)}if(pending.length>20000)throw Error('invalid stream')}if(pending.trim())line(pending)}finally{reader.releaseLock()}}
+    else for(const raw of (await response.text()).split('\n'))line(raw);
+    if(!answer)throw Error('incomplete stream');return answer;
+  }
   async function chat(text){
     text=String(text||'').trim().slice(0,600);if(!text)return;
     if(busy){toast('等小麦说完这一句，再继续聊吧');return}
@@ -34,9 +43,8 @@
     if(!online){offlineChat(text);add('assistant',document.getElementById('speech').textContent);return}
     setBusy(true);const id=++sequence,actionCount=XM.state.total;const requestController=new AbortController();controller=requestController;const timer=setTimeout(()=>requestController.abort(),110000);
     try{
-      const response=await fetch(endpoint,{method:'POST',credentials:'omit',redirect:'error',headers:{'Content-Type':'application/json','X-Xiaomai-Access':access},body:JSON.stringify({message:text,history:turns.slice(-12),outfit:XM.state.outfit,scene:XM.state.scene,effort,clientVersion:2,preferences}),signal:requestController.signal});
-      const data=await response.json();if(id!==sequence)return;
-      if(!response.ok)throw Object.assign(Error('request failed'),{code:data.error});
+      const response=await fetch(endpoint,{method:'POST',credentials:'omit',redirect:'error',headers:{'Content-Type':'application/json','X-Xiaomai-Access':access},body:JSON.stringify({message:text,history:turns.slice(-12),outfit:XM.state.outfit,scene:XM.state.scene,effort,clientVersion:2,preferences,stream:true}),signal:requestController.signal});
+      const data=await readReply(response,partial=>{if(id===sequence){say(partial);mode.textContent='小麦正在说…'}});if(id!==sequence)return;
       if(typeof data.reply!=='string'||!data.reply.trim()||data.reply.length>800||!actions.has(data.action))throw Error('invalid reply');
       turns.push({role:'user',content:text},{role:'assistant',content:data.reply});turns=turns.slice(-12);
       add('assistant',data.reply);window.XM.showAIReply(data.reply,data.action,XM.state.total===actionCount);

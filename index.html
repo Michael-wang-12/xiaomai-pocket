@@ -357,7 +357,7 @@ setOutfitInitial();applyScene(state.scene);render();rest();persist();if(state.to
 let lastBlushAt=0;
 window.XM={showAIReply(reply,action,move=true){lastInteraction=Date.now();state.chats++;if(move){if(action==='blush'&&Date.now()-lastBlushAt>45000){lastBlushAt=Date.now();animate(0,'nod',3600);activeAction='blush';$('actorWrap').dataset.action='blush';$('currentAction').textContent='有点心动';$('currentAction').hidden=false}else if(action!=='none'&&byId[action])playAction(action,byId[action]);else animate(0,'nod')}say(reply);delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()},get state(){return state},actions:A,perform,openGame,closeSheet,chat,clean,get pose(){return currentPose},get gameTimers(){return gameTimers.length},plans:PLANS,atlas:ATLAS,get activeAction(){return activeAction},get currentFrame(){return currentFrame},get frameHistory(){return [...frameHistory]},get motionTimers(){return frameTimers.length},get turnReady(){return spriteAssetReady(spriteSource(36))},get wardrobeReady(){return wardrobeReady},wardrobeFrames:OUTFIT_FRAMES,spriteSource,loadSpriteImage,actionUrls,get pendingAction(){return pendingActionId},rest};
 </script>
-<script src="chat-config.js?v=8.0"></script>
-<script src="chat-client.js?v=8.0"></script>
+<script src="chat-config.js?v=8.1"></script>
+<script src="chat-client.js?v=8.1"></script>
 </body>
 </html>
