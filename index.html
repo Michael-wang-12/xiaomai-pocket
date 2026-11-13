@@ -214,6 +214,7 @@ function paintSprite(frame,outfit,url,portrait=false){
   sprite.style.backgroundPosition=`${(n%columns)*100/(columns-1)}% ${Math.floor(n/columns)*100/(columns-1)}%`;
   sprite.dataset.frame=portrait?0:frame;
   sprite.dataset.outfit=outfit;
+  if(spriteAssetReady(url))$('imageLoading').hidden=true;
   sprite.dataset.facing=turning?['正面','左前方','左前方','左前方','左侧','左后方','左后方','左后方','背面','右后方','右后方','右后方','右侧','右前方','右前方','右前方'][n]:'';
   sprite.setAttribute('aria-label','小麦'+(outfit?' · '+byId[outfit].label:'')+(turning?' · '+sprite.dataset.facing:''));
 }
@@ -262,6 +263,8 @@ function playActionFrames(id,a){if(a.cat==='穿搭'){cancelMotion();activeAction
 function syncComposer(){const v=window.visualViewport;const inset=v&&v.scale===1?Math.max(0,innerHeight-v.height-v.offsetTop):0;document.documentElement.style.setProperty('--keyboard-inset',Math.round(inset)+'px')}
 if(window.visualViewport){visualViewport.addEventListener('resize',syncComposer);visualViewport.addEventListener('scroll',syncComposer)}window.addEventListener('resize',syncComposer);syncComposer();
 $('chatInput').addEventListener('focus',()=>{document.body.classList.add('typing');syncComposer()});$('chatInput').addEventListener('blur',()=>{document.body.classList.remove('typing');syncComposer()});
+// 点发送时保留输入焦点，避免键盘收起后按钮移动，吞掉这一次点击。
+document.querySelector('#chatForm .send').addEventListener('pointerdown',e=>{if(document.activeElement===$('chatInput'))e.preventDefault()});
 if(window.ResizeObserver)new ResizeObserver(entries=>{document.documentElement.style.setProperty('--composer-space',Math.ceil(entries[0].contentRect.height+30)+'px')}).observe($('composer'));
 loadSpriteImage(spriteSource(0)).then(()=>{$('imageLoading').hidden=true}).catch(()=>{$('imageLoading').textContent='形象加载未完成，请刷新试试'});
 
