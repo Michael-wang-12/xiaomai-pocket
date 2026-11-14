@@ -13,7 +13,7 @@
  function schedule(now=Date.now()){observedActivity=lastInteraction;const m=modes[mode];nextAt=m.min?now+Math.round(m.min+Math.random()*(m.max-m.min)):Infinity}
  function active(){lastInteraction=Date.now();schedule(lastInteraction)}
  function paused(){const el=document.activeElement;return document.hidden||!document.hasFocus()||!$('veil').hidden||window.XM_AI?.busy||window.XM_PHOTO?.busy||window.XM_PHOTO?.hasPendingPhoto||Boolean(el?.matches('input,textarea,select,[contenteditable="true"]'))||Boolean(XM.activeAction)||Boolean(XM.pendingAction)}
- function choose(){const pool=[...lines.general,...(lines[XM.state.scene]||[]),...(lines[XM.state.outfit]||[])];let available=pool.filter(([text])=>!recent.includes(text));if(!available.length)available=pool;const selected=available[Math.floor(Math.random()*available.length)];recent=[...recent,selected[0]].slice(-5);return selected}
+ function choose(){const pool=[...lines.general,...(lines[XM.state.scene]||[]),...(lines[XM_WEAR.body(XM.state)]||[]),...Object.values(XM.state.accessories).flatMap(id=>lines[id]||[])];let available=pool.filter(([text])=>!recent.includes(text));if(!available.length)available=pool;const selected=available[Math.floor(Math.random()*available.length)];recent=[...recent,selected[0]].slice(-5);return selected}
  function tick(){
   const now=Date.now();if(observedActivity!==lastInteraction)schedule(lastInteraction);
   if(mode==='quiet'||now<nextAt)return false;

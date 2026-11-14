@@ -42,7 +42,7 @@ function settleEmotion(kind){
  emotionTimers.push(setTimeout(()=>{
   if(token!==emotionToken)return;
   // Cross-fade two dressed poses; the whole image is never rotated or flattened.
-  const ghost=$('sprite').cloneNode(false);ghost.removeAttribute('id');ghost.removeAttribute('role');ghost.setAttribute('aria-hidden','true');ghost.className='sprite emotion-ghost';$('actor').prepend(ghost);
+  const ghost=$('sprite').cloneNode(true);ghost.removeAttribute('id');ghost.removeAttribute('role');ghost.setAttribute('aria-hidden','true');ghost.className='sprite emotion-ghost';$('actor').prepend(ghost);
   wrap.dataset.emotion='fading';wrap.style.setProperty('--emotion-blush','0');$('currentAction').classList.add('emotion-fading');
   setFrame(state.energy<28?3:state.mood<38?4:0);
   // Force the starting opacity before asking CSS to blend into the neutral pose.
