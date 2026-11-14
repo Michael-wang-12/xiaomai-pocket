@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#eef2e9">
-<meta name="description" content="小麦的口袋：56种趣味互动、8个小游戏，点开就能和小麦一起玩。无需安装，进度留在自己的手机里。">
+<meta name="description" content="小麦的口袋：60种趣味互动、8个小游戏，点开就能和小麦一起玩。无需安装，进度留在自己的手机里。">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="小麦">
 <meta name="mobile-web-app-capable" content="yes">
 <meta property="og:title" content="小麦的口袋 🌾">
-<meta property="og:description" content="一个有点酷、也有点可爱的口袋搭档。56种互动，点开就能玩。">
+<meta property="og:description" content="一个有点酷、也有点可爱的口袋搭档。60种互动，点开就能玩。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://michael-wang-12.github.io/xiaomai-pocket/">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data: blob:; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' https://xiaomai-chat-michaelwrz12-3929.vercel.app; media-src data: blob:; base-uri 'none'; form-action 'none'">
@@ -50,6 +50,8 @@ header{margin-bottom:12px}h1{font-size:25px}.eyebrow{font-size:9px;letter-spacin
 @keyframes reactionSettle{from{transform:translateY(2px)}to{transform:translateY(0)}}@keyframes reactionHesitate{0%,100%{transform:translateY(0)}35%{transform:translateY(-3px)}65%{transform:translateY(1px)}}@keyframes reactionNod{0%,100%{transform:translateY(0)}45%{transform:translateY(3px)}}@keyframes reactionGlance{0%,100%{transform:rotate(0)}45%{transform:rotate(-1.5deg) translateX(-2px)}}@keyframes reactionAside{0%,100%{transform:rotate(0)}40%,75%{transform:rotate(1.5deg) translateX(3px)}}@keyframes reactionProud{from{transform:translateY(2px) scale(1)}to{transform:translateY(-2px) scale(1.025)}}@keyframes reactionClose{from{transform:scale(1)}to{transform:scale(1.06) translateY(2px)}}@keyframes reactionHold{0%,100%{transform:scale(1.06) translateY(2px)}50%{transform:scale(1.08) translateY(3px)}}@keyframes reactionListen{0%,100%{transform:translateY(0)}50%{transform:translateY(1px) rotate(-.5deg)}}
 .small-talk-label{font-weight:650;margin:14px 0 9px}.small-talk-options{display:flex;gap:8px}.small-talk-options button{flex:1;min-height:42px;border-radius:12px;border:1px solid var(--line);background:white}.small-talk-options button[aria-pressed=true]{background:var(--green);color:white;border-color:var(--green)}.small-talk-hint{font-size:11px!important;color:var(--muted);line-height:1.75}
 .actor-wrap[data-emotion] .blush-overlay{opacity:var(--emotion-blush,0);transition:opacity 1s ease-out}.emotion-ghost{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:1;transition:opacity 1s ease-out;will-change:opacity}.current-action.emotion-label{opacity:.82;transition:opacity 1s ease-out}.current-action.emotion-label.emotion-fading{opacity:0}@media(prefers-reduced-motion:reduce){.emotion-ghost,.current-action.emotion-label{transition:none}}
+.wardrobe-heading{grid-column:1/-1;font-size:12px;font-weight:650;color:var(--muted);margin:9px 0 1px}.clothes-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.action.clothes-action{min-width:0;min-height:144px;gap:9px;padding:12px 6px;font-size:11px;font-weight:650}.clothes-preview{display:block;width:100%;max-width:96px;height:auto;aspect-ratio:1;background-size:300% 300%;background-position:0 0;background-repeat:no-repeat;filter:drop-shadow(0 5px 3px #273c3220)}
+.tie-option{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:12px 15px;border:1px solid var(--line);border-radius:13px;background:#fff}.tie-option[aria-pressed=true]{background:#e3eadb;border-color:#8ba17c}.tie-option small{font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -58,7 +60,7 @@ header{margin-bottom:12px}h1{font-size:25px}.eyebrow{font-size:9px;letter-spacin
 <section class="stats" aria-label="小麦的状态"><div class="stat"><div class="stat-top">心情 <b id="moodValue"></b></div><div class="track"><i id="moodBar"></i></div></div><div class="stat"><div class="stat-top">饱腹 <b id="foodValue"></b></div><div class="track"><i id="foodBar" style="--bar:#bd9e6c"></i></div></div><div class="stat"><div class="stat-top">精力 <b id="energyValue"></b></div><div class="track"><i id="energyBar" style="--bar:#82a5a0"></i></div></div><div class="stat"><div class="stat-top">默契 <b id="bondValue"></b></div><div class="track"><i id="bondBar" style="--bar:#b59b83"></i></div></div></section>
 <section class="room" id="room" aria-label="小麦的小世界"><div class="sun"></div><div class="room-label"><i></i><span id="roomName">山野小憩</span></div><button class="scene-btn" id="sceneButton">换个风景 ↗</button><div class="bubble" id="bubble" aria-live="polite"><b>小麦</b><span id="speech">想你了宝宝。过来挨着我坐。</span></div><div class="floor-shadow"></div><div class="action-effects" id="actionEffects"></div><div class="current-action" id="currentAction" hidden></div><div class="image-loading" id="imageLoading">小麦在整理衣服…</div><div class="leaf">🌿</div><div class="leaf right">🌾</div><div class="actor-wrap" id="actorWrap" role="button" tabindex="0" aria-label="与小麦互动：轻点摸头，长按拥抱，滑动活动"><div class="actor" id="actor"><div class="sprite" id="sprite" role="img" aria-label="黑框眼镜、黑发黑色外套的男生小麦"></div><div class="blush-overlay" aria-hidden="true"><i></i><i></i></div><div class="prop" id="prop"></div></div></div><div class="wearing-label" id="wearingLabel" hidden></div><div class="wardrobe-loading" id="wardrobeLoading" hidden>穿搭准备中…</div><div class="status-badge" id="statusBadge">自在发呆中</div><div class="particles" id="particles"></div><div class="gesture-hint">点点脑袋 · 长按抱抱 · 左右滑动转身</div></section>
 <div class="quick"><button data-action="head">✋ 摸摸头</button><button data-action="rice">🍙 投喂一下</button><button id="randomButton">🎲 随机互动</button></div>
-<section aria-label="互动百宝箱"><div class="section-heading"><h2>今天，玩点什么？</h2><span class="small" id="progress">56 种小互动</span></div><nav class="tabs" id="tabs" aria-label="互动分类"></nav><p class="wardrobe-note" id="wardrobeNote" hidden></p><div class="actions" id="actions"></div></section>
+<section aria-label="互动百宝箱"><div class="section-heading"><h2>今天，玩点什么？</h2><span class="small" id="progress">60 种小互动</span></div><nav class="tabs" id="tabs" aria-label="互动分类"></nav><p class="wardrobe-note" id="wardrobeNote" hidden></p><div class="actions" id="actions"></div></section>
 
 </main>
 <aside class="composer" id="composer" aria-label="和小麦聊天"><div class="reply-peek" id="replyPeek">我在。想聊什么，随时说。</div><div class="model-controls" id="modelControls" hidden><span>GPT-6.1 Terra</span><div role="group" aria-label="推理强度"><span class="reasoning-label">推理</span><button type="button" data-effort="low" aria-pressed="false">低</button><button type="button" data-effort="medium" aria-pressed="true">中</button><button type="button" data-effort="high" aria-pressed="false">高</button></div></div><form class="chat" id="chatForm"><input id="chatInput" aria-label="对小麦说句话" maxlength="120" placeholder="和小麦说句话…" autocomplete="off"><button class="send" type="submit" aria-label="发送">↑</button></form><div class="foot"><span id="chatMode">本机趣味对话</span><button type="button" class="history-link" id="chatHistoryButton">聊天记录</button><span id="saveLabel">正在准备小口袋</span></div></aside>
@@ -102,6 +104,10 @@ const A=[
 ['camp','出游','🏕️','搭个小营',2,'nod','营地已搭好，欢迎队友入住。|今晚的任务：好好放松。',7,0,-2,2,'🏕️'],
 ['sea','出游','🌊','去看海',6,'stretch','对着海喊一句：今天也不错！|浪来一下，烦恼少一点。',8,0,-3,2,'🌊'],
 ['photo','出游','📷','摆个合照',2,'nod','三、二、一。别眨眼。|这一刻，收进我们的手记。',6,0,0,3,'📸'],
+['leather','穿搭','🧥','简约皮夹克',0,'nod','皮衣换好了。怎么样，这身够不够帅？|新衣服给你先看。别光盯着，夸一句呀。',4,0,0,1,'✨'],
+['bomber','穿搭','🧥','飞行员皮衣',0,'nod','今天走轻松路线，要不要一起出去逛逛？|这件穿着挺自在。你看我，是看衣服还是看人呀？',4,0,0,1,'✨'],
+['blackshirt','穿搭','👔','黑衬衫',0,'nod','今天换黑衬衫。怎么样，这身有精神吧？|你选的黑衬衫穿好了。要不要靠近点看看？',4,0,0,1,'✨'],
+['tie','穿搭','👔','打上领带',0,'nod','黑领带也系好了。今天是不是更像样了一点？|领带系好了，来，帮我看看正不正。',3,0,0,1,'✨'],
 ['cap','穿搭','🧢','棒球帽',2,'nod','休闲模式，出门打球？|帽檐一压，今天走运动路线。',4,0,0,1,'🧢'],
 ['headphone','穿搭','🎧','戴上耳机',0,'nod','左边耳机分你。听同一首歌。|降噪打开，只听见你的声音。',5,0,1,2,'🎧'],
 ['scarf','穿搭','🧣','围上围巾',0,'nod','暖和，也挺好看。|围好了。你那条呢？',4,0,2,1,'🍂'],
@@ -109,7 +115,7 @@ const A=[
 ['crown','穿搭','👑','小小王冠',2,'bounce','今天轮到我当一回队长。|本队长宣布：大家都要开心。',6,0,0,2,'⭐'],
 ['flower','穿搭','🌼','别朵小花',1,'nod','行，这朵我收下了。|黑色外套配小花，还挺有意思。',6,0,0,2,'🌼'],
 ['party','穿搭','🎉','派对小帽',5,'bounce','今天是什么好日子？见到你就算。|气氛组小麦，正式上岗。',7,0,-1,2,'🎊'],
-['resetLook','穿搭','🧥','原版穿搭',0,'nod','还是这身最自在。|黑衣、眼镜，小麦本人。',3,0,0,1,'✨'],
+['resetLook','穿搭','🧥','黑色长外套',0,'nod','还是这身最自在。|黑衣、眼镜，小麦本人。',3,0,0,1,'✨'],
 ['rps','小游戏','✊','石头剪刀布',1,'bounce','来，一局定胜负。',2,0,-1,1,'✊'],
 ['number','小游戏','🔢','猜个数字',0,'nod','我想了一个 1 到 5 的数字，猜猜看。',2,0,-1,1,'🔢'],
 ['memory','小游戏','🃏','翻牌配对',0,'nod','记性比拼开始。我给你加油。',2,0,-1,1,'🃏'],
@@ -129,7 +135,7 @@ const A=[
 ].map(([id,cat,emoji,label,pose,motion,lines,mood,food,energy,bond,particle])=>({id,cat,emoji,label,pose,motion,lines:lines.split('|'),delta:{mood,food,energy,bond},particle}));
 const byId=Object.fromEntries(A.map(a=>[a.id,a]));
 const defaults=()=>({version:1,mood:78,food:70,energy:82,bond:12,created:Date.now(),last:Date.now(),seen:[],ach:[],outfit:'',scene:'day',sound:false,reduced:false,chats:0,total:0,gameWins:0,gamePlays:0,headTaps:0,streak:1,date:today(),daily:{actions:0,games:0,care:0},dailyClaimed:false,log:[]});
-function clean(raw){const d=defaults();if(!raw||typeof raw!=='object'||Array.isArray(raw))return d;for(const k of ['mood','food','energy','bond'])if(Number.isFinite(raw[k]))d[k]=clamp(raw[k]);for(const k of ['total','chats','gameWins','gamePlays','headTaps','streak','created','last'])if(Number.isFinite(raw[k])&&raw[k]>=0)d[k]=Math.min(raw[k],1e15);d.seen=Array.isArray(raw.seen)?[...new Set(raw.seen.filter(x=>byId[x]))]:[];d.ach=Array.isArray(raw.ach)?raw.ach.filter(x=>typeof x==='string').slice(0,30):[];d.outfit=['cap','headphone','scarf','sunglass','crown','flower','party',''].includes(raw.outfit)?raw.outfit:'';d.scene=['day','night','sunset','rain'].includes(raw.scene)?raw.scene:'day';d.sound=raw.sound===true;d.reduced=raw.reduced===true;if(typeof raw.date==='string'&&raw.date.length<20)d.date=raw.date;d.dailyClaimed=raw.dailyClaimed===true;if(raw.daily&&typeof raw.daily==='object')for(const k of ['actions','games','care'])if(Number.isFinite(raw.daily[k]))d.daily[k]=Math.max(0,Math.min(1e6,raw.daily[k]));d.log=Array.isArray(raw.log)?raw.log.filter(x=>x&&typeof x.text==='string'&&typeof x.time==='number').slice(-35).map(x=>({text:x.text.slice(0,120),time:x.time})):[];return d}
+function clean(raw){const d=defaults();if(!raw||typeof raw!=='object'||Array.isArray(raw))return d;for(const k of ['mood','food','energy','bond'])if(Number.isFinite(raw[k]))d[k]=clamp(raw[k]);for(const k of ['total','chats','gameWins','gamePlays','headTaps','streak','created','last'])if(Number.isFinite(raw[k])&&raw[k]>=0)d[k]=Math.min(raw[k],1e15);d.seen=Array.isArray(raw.seen)?[...new Set(raw.seen.filter(x=>byId[x]))]:[];d.ach=Array.isArray(raw.ach)?raw.ach.filter(x=>typeof x==='string').slice(0,30):[];d.outfit=['leather','bomber','blackshirt','blackshirt-tie','cap','headphone','scarf','sunglass','crown','flower','party',''].includes(raw.outfit)?raw.outfit:'';d.scene=['day','night','sunset','rain'].includes(raw.scene)?raw.scene:'day';d.sound=raw.sound===true;d.reduced=raw.reduced===true;if(typeof raw.date==='string'&&raw.date.length<20)d.date=raw.date;d.dailyClaimed=raw.dailyClaimed===true;if(raw.daily&&typeof raw.daily==='object')for(const k of ['actions','games','care'])if(Number.isFinite(raw.daily[k]))d.daily[k]=Math.max(0,Math.min(1e6,raw.daily[k]));d.log=Array.isArray(raw.log)?raw.log.filter(x=>x&&typeof x.text==='string'&&typeof x.time==='number').slice(-35).map(x=>({text:x.text.slice(0,120),time:x.time})):[];return d}
 let initial;try{initial=window.__INITIAL__||JSON.parse(localStorage.getItem('xiaomai-v1')||'null')}catch{}
 let state=clean(initial),category='亲近',poseTimer=0,toastTimer=0,saveTimer=0,gameTimers=[],gameToken=0,lastFocus=null,dialogKind='',lastInteraction=Date.now(),lastSequence=[],currentPose=0,currentMotion='breathe',savingWarned=false;
 const away=Math.max(0,Math.min(8,(Date.now()-state.last)/3600000));state.food=Math.max(20,state.food-away*2);state.energy=Math.max(20,state.energy-away);state.mood=Math.max(35,state.mood-away);
@@ -204,7 +210,7 @@ laugh:{f:[0,5,15,5,5],step:400,m:'chuckle',fx:'laugh'}
 // 每套穿搭都有完整的动作、照顾、运动和转身图集。
 const SHEET_NAMES=['base','social','care','motion','turn'];
 </script>
-<script src="reactions.js?v=8.4"></script>
+<script src="reactions.js?v=8.5"></script>
 <script>
 const spriteCache=new Map();
 let paintVersion=0,pendingActionId='';
@@ -228,7 +234,7 @@ function paintSprite(frame,outfit,url,portrait=false){
   sprite.dataset.outfit=outfit;
   if(spriteAssetReady(url))$('imageLoading').hidden=true;
   sprite.dataset.facing=turning?['正面','左前方','左前方','左前方','左侧','左后方','左后方','左后方','背面','右后方','右后方','右后方','右侧','右前方','右前方','右前方'][n]:'';
-  sprite.setAttribute('aria-label','小麦'+(outfit?' · '+byId[outfit].label:'')+(turning?' · '+sprite.dataset.facing:''));
+  sprite.setAttribute('aria-label','小麦'+(outfit?' · '+outfitLabel(outfit):'')+(turning?' · '+sprite.dataset.facing:''));
 }
 function setFrame(frame){
   currentFrame=frame;currentPose=frame;frameHistory.push(frame);frameHistory=frameHistory.slice(-64);
@@ -236,7 +242,7 @@ function setFrame(frame){
   const commit=()=>{if(version!==paintVersion||state.outfit!==outfit)return;paintSprite(frame,outfit,url);updateWearLabel()};
   if(spriteAssetReady(url)){commit();return}
   // 等待动作图时保持同一套穿搭的完整静态形象，不能闪回未穿搭的人物。
-  if(outfit&&wardrobeReady)paintSprite(0,outfit,WARDROBE_URL,true);
+  if(outfit&&spriteAssetReady(wardrobePortraitSource(outfit)))paintSprite(0,outfit,wardrobePortraitSource(outfit),true);
   else if(!outfit)paintSprite(frame,'',url);
   else loadWardrobe();
   loadSpriteImage(url).then(commit).catch(()=>{if(version===paintVersion)updateWearLabel()});
@@ -271,7 +277,7 @@ function animate(pose,motion='breathe',duration=2700){cancelMotion();activeActio
 function rest(emotion=''){cancelMotion();activeAction='';$('actorWrap').dataset.action='';$('actor').className='actor '+(state.energy<28?'sleep':'breathe');setFrame(state.energy<28?3:state.mood<38?4:0);$('prop').textContent='';$('actionEffects').className='action-effects';$('actionEffects').replaceChildren();$('currentAction').hidden=true;if(emotion)settleEmotion(emotion)}
 const FX={pat:['✋'],poke:['💢'],hug:['🤍','🤍'],five:['✦','✦'],fist:['⚡'],tickle:['〰','😂'],spark:['✦','✧'],leaves:['🍃','🍃'],yum:['✦','✦'],steam:['〰','〰'],water:['💧','💧'],sleep:['Z','z','z'],hello:['〰'],music:['♪','♫'],wind:['〰','〰'],jump:['✦','✦'],sun:['☀'],boxing:['💥','💥'],picnic:['🌼'],stars:['✦','✧','✦'],rain:['💧'],camp:['🔥'],sea:['🌊','🌊'],camera:[''],crown:['✦','✦'],flower:['🌼','🌼'],party:['🎊','🎉'],question:['?'],cards:['🃏'],laugh:['ha','ha'],secret:['…'],gift:['✦','🎊'],grumpy:['💢']};
 function showEffects(kind){const layer=$('actionEffects');layer.className='action-effects fx-'+kind;layer.replaceChildren();for(const [i,s]of (FX[kind]||[]).entries()){const el=document.createElement('span');el.className='fx-item item-'+i;el.textContent=s;el.style.setProperty('--i',i);layer.append(el)}}
-function playActionFrames(id,a){if(REACTIONS[id]){playReaction(id,a);return}if(a.cat==='穿搭'){cancelMotion();activeAction=id;frameHistory=[];$('actorWrap').dataset.action=id;$('currentAction').textContent=a.emoji+' '+(state.outfit?a.label:'原版穿搭');$('currentAction').hidden=false;$('actor').className='actor wardrobe-change';$('prop').textContent='';showEffects('spark');setFrame(0);poseTimer=setTimeout(rest,1800);return}const plan=PLANS[id];if(!plan){animate(a.pose,a.motion);return}cancelMotion();const token=motionToken;activeAction=id;frameHistory=[];$('actorWrap').dataset.action=id;$('currentAction').textContent=a.emoji+' '+a.label;$('currentAction').hidden=false;$('actor').className='actor '+(state.reduced?'':plan.m);currentMotion=plan.m;$('prop').textContent=plan.prop||'';showEffects(plan.fx);let delay=0;const r=$('room').getBoundingClientRect(),v=window.visualViewport;const visibleHeight=v?v.height:innerHeight;if(r.top< -80||r.top>visibleHeight*.55){$('room').scrollIntoView({block:'start',behavior:state.reduced?'auto':'smooth'});delay=220}const frames=state.reduced?[plan.f[0]]:plan.f;frames.forEach((f,i)=>{const t=setTimeout(()=>{if(token===motionToken)setFrame(f)},delay+i*plan.step);frameTimers.push(t)});setFrame(frames[0]);poseTimer=setTimeout(()=>{if(token===motionToken)rest()},delay+(state.reduced?1400:frames.length*plan.step+450))}
+function playActionFrames(id,a){if(REACTIONS[id]){playReaction(id,a);return}if(a.cat==='穿搭'){cancelMotion();activeAction=id;frameHistory=[];$('actorWrap').dataset.action=id;$('currentAction').textContent=a.emoji+' '+(id==='tie'?(state.outfit==='blackshirt-tie'?'打上领带':'解下领带'):(state.outfit?a.label:'原版穿搭'));$('currentAction').hidden=false;$('actor').className='actor wardrobe-change';$('prop').textContent='';showEffects('spark');setFrame(0);poseTimer=setTimeout(rest,1800);return}const plan=PLANS[id];if(!plan){animate(a.pose,a.motion);return}cancelMotion();const token=motionToken;activeAction=id;frameHistory=[];$('actorWrap').dataset.action=id;$('currentAction').textContent=a.emoji+' '+a.label;$('currentAction').hidden=false;$('actor').className='actor '+(state.reduced?'':plan.m);currentMotion=plan.m;$('prop').textContent=plan.prop||'';showEffects(plan.fx);let delay=0;const r=$('room').getBoundingClientRect(),v=window.visualViewport;const visibleHeight=v?v.height:innerHeight;if(r.top< -80||r.top>visibleHeight*.55){$('room').scrollIntoView({block:'start',behavior:state.reduced?'auto':'smooth'});delay=220}const frames=state.reduced?[plan.f[0]]:plan.f;frames.forEach((f,i)=>{const t=setTimeout(()=>{if(token===motionToken)setFrame(f)},delay+i*plan.step);frameTimers.push(t)});setFrame(frames[0]);poseTimer=setTimeout(()=>{if(token===motionToken)rest()},delay+(state.reduced?1400:frames.length*plan.step+450))}
 function syncComposer(){const v=window.visualViewport;const inset=v&&v.scale===1?Math.max(0,innerHeight-v.height-v.offsetTop):0;document.documentElement.style.setProperty('--keyboard-inset',Math.round(inset)+'px')}
 if(window.visualViewport){visualViewport.addEventListener('resize',syncComposer);visualViewport.addEventListener('scroll',syncComposer)}window.addEventListener('resize',syncComposer);syncComposer();
 $('chatInput').addEventListener('focus',()=>{document.body.classList.add('typing');syncComposer()});$('chatInput').addEventListener('blur',()=>{document.body.classList.remove('typing');syncComposer()});
@@ -284,23 +290,26 @@ loadSpriteImage(spriteSource(0)).then(()=>{$('imageLoading').hidden=true}).catch
 function particles(emoji='✨',n=7){if(state.reduced)n=1;for(let i=0;i<n;i++){const el=document.createElement('span');el.className='particle';el.textContent=emoji;el.style.left=(30+Math.random()*40)+'%';el.style.top=(36+Math.random()*24)+'%';el.style.setProperty('--dx',(Math.random()*160-80)+'px');el.style.setProperty('--r',(Math.random()*80-40)+'deg');el.style.animationDelay=(i*.055)+'s';$('particles').append(el);setTimeout(()=>el.remove(),1900)}}
 let audio;function beep(){if(!state.sound)return;try{audio=audio||new(window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();const osc=audio.createOscillator(),g=audio.createGain();osc.type='sine';osc.frequency.setValueAtTime(650,audio.currentTime);osc.frequency.exponentialRampToValueAtTime(950,audio.currentTime+.09);g.gain.setValueAtTime(.045,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.14);osc.connect(g);g.connect(audio.destination);osc.start();osc.stop(audio.currentTime+.15)}catch{}}
 // 穿搭使用完整人物图，去掉独立贴在头脸上的表情符号配饰。
-const OUTFIT_FRAMES={cap:0,headphone:1,scarf:2,sunglass:3,crown:4,flower:5,party:6};
+const OUTFIT_FRAMES={leather:0,bomber:0,blackshirt:0,'blackshirt-tie':0,cap:0,headphone:1,scarf:2,sunglass:3,crown:4,flower:5,party:6};
 const WARDROBE_URL='assets/xiaomai-wardrobe-v3.png';
-let wardrobeReady=false,wardrobeLoading=false;
+function isShirtOutfit(outfit=state.outfit){return outfit==='blackshirt'||outfit==='blackshirt-tie'}
+function outfitLabel(outfit=state.outfit){return outfit==='blackshirt-tie'?'黑衬衫 · 黑色领带':byId[outfit]?.label||'黑色长外套'}
+function wardrobePortraitSource(outfit=state.outfit){return ['leather','bomber','blackshirt','blackshirt-tie'].includes(outfit)?spriteSource(0,outfit):WARDROBE_URL}
 function loadWardrobe(){
-  if(wardrobeReady||wardrobeLoading)return;
-  wardrobeLoading=true;
-  loadSpriteImage(WARDROBE_URL).then(()=>{wardrobeReady=true;wardrobeLoading=false;updateWearLabel();setFrame(currentFrame)}).catch(()=>{wardrobeLoading=false;updateWearLabel()});
+  const outfit=state.outfit,url=wardrobePortraitSource(outfit);
+  if(!outfit||spriteAssetReady(url))return;
+  loadSpriteImage(url).then(()=>{if(state.outfit!==outfit)return;updateWearLabel();setFrame(currentFrame)}).catch(()=>{if(state.outfit===outfit){updateWearLabel();toast('这套衣服还没加载好，联网后再试一下。')}});
 }
 function updateWearLabel(){
-  const info=$('wearingLabel');info.hidden=!state.outfit;info.textContent=state.outfit?'穿搭 · '+byId[state.outfit].label:'';
-  const portraitPending=wardrobeLoading&&!spriteAssetReady(spriteSource(0));
+  const info=$('wearingLabel');info.hidden=!state.outfit;info.textContent=state.outfit?'穿搭 · '+outfitLabel():'';
+  const portraitUrl=wardrobePortraitSource(),portraitPending=state.outfit&&spriteCache.has(portraitUrl)&&!spriteAssetReady(portraitUrl);
   $('wardrobeLoading').hidden=!state.outfit||(!portraitPending&&!pendingActionId);
   $('wardrobeLoading').textContent=pendingActionId?'正在准备这套动作…':'穿搭准备中…';
-  $('wardrobeNote').hidden=category!=='穿搭';$('wardrobeNote').textContent='选定后，全程保持当前穿搭；再次点选可脱下。';
+  $('wardrobeNote').hidden=category!=='穿搭';$('wardrobeNote').textContent='衣服选定后，互动和刷新会保留；再次点选当前衣服可换回原版。黑衬衫可加黑领带，配饰造型搭配长外套。';
 }
 function setOutfit(id){
-  const next=id==='resetLook'||state.outfit===id?'':id;
+  if(id==='tie'&&!isShirtOutfit())return;
+  const next=id==='tie'?(state.outfit==='blackshirt-tie'?'blackshirt':'blackshirt-tie'):(id==='resetLook'||state.outfit===id||(id==='blackshirt'&&isShirtOutfit())?'':id);
   if(next&&!Object.prototype.hasOwnProperty.call(OUTFIT_FRAMES,next))return;
   state.outfit=next;
   cancelMotion();
@@ -321,11 +330,17 @@ function setOutfitInitial(){
 }
 
 function applyScene(scene){state.scene=scene;$('room').className='room '+(scene==='day'?'':scene);$('roomName').textContent={day:'山野小憩',night:'星空夜话',sunset:'日落放空',rain:'听雨时间'}[scene];$('room').querySelectorAll('.rain-drop').forEach(n=>n.remove());if(scene==='rain')for(let i=0;i<12;i++){const r=document.createElement('i');r.className='rain-drop';r.style.left=Math.random()*100+'%';r.style.animationDelay=Math.random()*2+'s';$('room').append(r)}}
-const ACH=[['first','🤝','初次击掌',()=>state.seen.includes('five')],['friend','🌾','熟悉的朋友',()=>state.total>=20],['explore','🧭','互动探险家',()=>state.seen.length>=25],['all','🏆','百宝箱大师',()=>state.seen.length===56],['care','🍙','照顾有方',()=>A.filter(a=>a.cat==='照顾').every(a=>state.seen.includes(a.id))],['play','🎮','最佳搭档',()=>state.gameWins>=5],['chat','💬','有话想说',()=>state.chats>=10],['bond','🤍','超有默契',()=>state.bond>=90],['fashion','🧢','穿搭收藏家',()=>A.filter(a=>a.cat==='穿搭').every(a=>state.seen.includes(a.id))],['rainbow','🌈','彩蛋发现者',()=>state.ach.includes('rainbow')],['night','🌙','星空同伴',()=>state.seen.includes('stars')],['streak','📅','三日之约',()=>state.streak>=3]];
+const ACH=[['first','🤝','初次击掌',()=>state.seen.includes('five')],['friend','🌾','熟悉的朋友',()=>state.total>=20],['explore','🧭','互动探险家',()=>state.seen.length>=25],['all','🏆','百宝箱大师',()=>state.seen.length===A.length],['care','🍙','照顾有方',()=>A.filter(a=>a.cat==='照顾').every(a=>state.seen.includes(a.id))],['play','🎮','最佳搭档',()=>state.gameWins>=5],['chat','💬','有话想说',()=>state.chats>=10],['bond','🤍','超有默契',()=>state.bond>=90],['fashion','🧢','穿搭收藏家',()=>A.filter(a=>a.cat==='穿搭').every(a=>state.seen.includes(a.id))],['rainbow','🌈','彩蛋发现者',()=>state.ach.includes('rainbow')],['night','🌙','星空同伴',()=>state.seen.includes('stars')],['streak','📅','三日之约',()=>state.streak>=3]];
 function achievements(){for(const [id,icon,name,check]of ACH)if(!state.ach.includes(id)&&check()){state.ach.push(id);log('解锁成就：'+name);toast(icon+' 成就解锁：'+name)}}
-function render(){for(const k of ['mood','food','energy','bond']){$(k+'Value').textContent=Math.round(state[k]);$(k+'Bar').style.width=state[k]+'%'}$('progress').textContent=`已体验 ${state.seen.length} / 56`;$('statusBadge').textContent=state.energy<28?'有点困，想歇一会儿':state.food<35?'肚子在打鼓':state.mood<38?'等你来哄一下':state.bond>=80?'超有默契':'自在发呆中';$('tabs').innerHTML=CATEGORIES.map(([c,e])=>`<button class="tab ${c===category?'active':''}" data-category="${c}" aria-pressed="${c===category}">${e} ${c}</button>`).join('');renderActions();document.documentElement.classList.toggle('reduced',state.reduced)}
-function renderActions(){updateWearLabel();$('actions').innerHTML=A.filter(a=>a.cat===category).map(a=>`<button class="action ${state.seen.includes(a.id)?'done':''} ${state.outfit===a.id?'worn':''}" data-action="${a.id}" aria-label="${a.label}"><span class="emoji" aria-hidden="true">${a.emoji}</span><span>${a.label}</span></button>`).join('')}
-function perform(id){const a=byId[id];if(!a)return;checkDate();lastInteraction=Date.now();state.total++;state.daily.actions++;if(a.cat==='照顾')state.daily.care++;if(!state.seen.includes(id)){state.seen.push(id);log('第一次：'+a.label)}let text=pick(a.lines);if(state.energy<28&&a.cat==='表演')text='虽然有点困，不过这一段还是能给你安排。';if(state.food>92&&['rice','noodle','fruit'].includes(id))text='已经很饱啦。那就尝一小口，剩下的留给你。';delta(a.delta);if(state.bond>75&&Math.random()<.2&&a.cat==='亲近')text+=' 给你的小偏心。';say(text);if(a.cat==='穿搭')setOutfit(id);playAction(id,a);particles(a.particle);beep();const scenes={tea:'day',picnic:'day',stars:'night',sunset:'sunset',rain:'rain',night:'night',morning:'day',sea:'day',camp:'night'};if(scenes[id])applyScene(scenes[id]);lastSequence.push(id);lastSequence=lastSequence.slice(-3);if(lastSequence.join(',')==='head,head,hug')easter('专属暗号','先摸头，再拥抱。好，我记住这个暗号了。');if(id==='head'){state.headTaps++;if(state.headTaps%7===0)easter('发型保卫战','摸了七次，发型申请工伤。赔我一个饭团！')}if(id==='gift'&&Math.random()<.3)easter('口袋惊喜','礼物里还有一张纸条：很高兴遇见你。');if(id==='company'&&state.scene==='night')easter('夜间陪伴','星星不说话，我也可以。陪你坐一会儿。');if(a.cat==='小游戏')openGame(id);achievements();render();persist()}
+function render(){for(const k of ['mood','food','energy','bond']){$(k+'Value').textContent=Math.round(state[k]);$(k+'Bar').style.width=state[k]+'%'}$('progress').textContent=`已体验 ${state.seen.length} / ${A.length}`;$('statusBadge').textContent=state.energy<28?'有点困，想歇一会儿':state.food<35?'肚子在打鼓':state.mood<38?'等你来哄一下':state.bond>=80?'超有默契':'自在发呆中';$('tabs').innerHTML=CATEGORIES.map(([c,e])=>`<button class="tab ${c===category?'active':''}" data-category="${c}" aria-pressed="${c===category}">${e} ${c}</button>`).join('');renderActions();document.documentElement.classList.toggle('reduced',state.reduced)}
+function renderActions(){
+  updateWearLabel();
+  const wardrobe=category==='穿搭',list=A.filter(a=>a.cat===category),clothesIds=['leather','bomber','blackshirt','resetLook'];
+  const tile=a=>{const clothes=clothesIds.includes(a.id),worn=wardrobe&&(a.id==='resetLook'?!state.outfit:a.id==='blackshirt'?isShirtOutfit():state.outfit===a.id);return `<button class="action ${state.seen.includes(a.id)?'done':''} ${worn?'worn':''} ${wardrobe&&clothes?'clothes-action':''}" data-action="${a.id}" aria-label="${a.label}" ${wardrobe?`aria-pressed="${worn}"`:''}>${wardrobe&&clothes?`<span class="clothes-preview" aria-hidden="true" style="background-image:url('${spriteSource(0,a.id==='resetLook'?'':a.id==='blackshirt'&&isShirtOutfit()?state.outfit:a.id)}')"></span>`:`<span class="emoji" aria-hidden="true">${a.emoji}</span>`}<span>${a.label}</span></button>`};
+  const tied=state.outfit==='blackshirt-tie',tieOption=wardrobe&&isShirtOutfit()?`<button type="button" class="tie-option" data-action="tie" aria-pressed="${tied}"><span>${tied?'解下领带':'打上领带'}</span><small>黑色细领带</small></button>`:'';
+  $('actions').innerHTML=wardrobe?'<h3 class="wardrobe-heading">All Black · 换衣服</h3><div class="clothes-options">'+list.filter(a=>clothesIds.includes(a.id)).map(tile).join('')+'</div>'+tieOption+'<h3 class="wardrobe-heading">配饰造型 · 长外套</h3>'+list.filter(a=>a.id!=='tie'&&!clothesIds.includes(a.id)).map(tile).join(''):list.map(tile).join('');
+}
+function perform(id){const a=byId[id];if(!a)return;if(id==='tie'&&!isShirtOutfit()){toast('先换上黑衬衫，再来打领带。');return}checkDate();lastInteraction=Date.now();state.total++;state.daily.actions++;if(a.cat==='照顾')state.daily.care++;if(!state.seen.includes(id)){state.seen.push(id);log('第一次：'+a.label)}let text=pick(a.lines);if(id==='tie'&&state.outfit==='blackshirt-tie')text='领带先解开，轻松一点。';if(state.energy<28&&a.cat==='表演')text='虽然有点困，不过这一段还是能给你安排。';if(state.food>92&&['rice','noodle','fruit'].includes(id))text='已经很饱啦。那就尝一小口，剩下的留给你。';delta(a.delta);if(state.bond>75&&Math.random()<.2&&a.cat==='亲近')text+=' 给你的小偏心。';say(text);if(a.cat==='穿搭')setOutfit(id);playAction(id,a);particles(a.particle);beep();const scenes={tea:'day',picnic:'day',stars:'night',sunset:'sunset',rain:'rain',night:'night',morning:'day',sea:'day',camp:'night'};if(scenes[id])applyScene(scenes[id]);lastSequence.push(id);lastSequence=lastSequence.slice(-3);if(lastSequence.join(',')==='head,head,hug')easter('专属暗号','先摸头，再拥抱。好，我记住这个暗号了。');if(id==='head'){state.headTaps++;if(state.headTaps%7===0)easter('发型保卫战','摸了七次，发型申请工伤。赔我一个饭团！')}if(id==='gift'&&Math.random()<.3)easter('口袋惊喜','礼物里还有一张纸条：很高兴遇见你。');if(id==='company'&&state.scene==='night')easter('夜间陪伴','星星不说话，我也可以。陪你坐一会儿。');if(a.cat==='小游戏')openGame(id);achievements();render();persist()}
 function easter(name,text){if(!state.ach.includes('rainbow'))state.ach.push('rainbow');say(text);particles('🌟',10);toast('彩蛋 · '+name);log('发现彩蛋：'+name)}
 function clearGame(){gameToken++;gameTimers.forEach(clearTimeout);gameTimers=[]}
 function later(fn,ms){const token=gameToken;const t=setTimeout(()=>{if(token===gameToken)fn()},ms);gameTimers.push(t);return t}
@@ -351,7 +366,7 @@ const CHAT=[[/是不是真人|你是真人|你是AI|真人在线|本人在回/,[
 function offlineChat(text){text=text.trim().slice(0,120);if(!text)return;if(/我不是\s*UU|我是.*(?:朋友|本人|创作者)/i.test(text))offlineVisitor=true;if(/^我是\s*UU(?:[，。！!\s]|$)/i.test(text))offlineVisitor=false;lastInteraction=Date.now();state.chats++;let match=(offlineVisitor?FRIEND_CHAT:CHAT).find(([r])=>r.test(text));const answer=match?pick(match[1]):offlineVisitor?pick(['好哦，我在听。','这句我还没接上，先陪你坐会儿。']):pick(['这句我还没接住，换个说法给我听听？','我在听呢，你接着说。','好哦，先挨着我坐一会儿。']);say(answer);animate(match?match[2]:0,'nod');delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()}
 function chat(text){return window.XM_AI?window.XM_AI.send(text):offlineChat(text)}
 document.addEventListener('click',e=>{const a=e.target.closest('[data-action]');if(a)perform(a.dataset.action);const c=e.target.closest('[data-category]');if(c){category=c.dataset.category;render();$('tabs').querySelector('.active').scrollIntoView({block:'nearest',inline:'nearest',behavior:state.reduced?'instant':'smooth'})}});
-$('chatForm').onsubmit=e=>{e.preventDefault();chat($('chatInput').value);$('chatInput').value=''};$('journalButton').onclick=journal;$('settingsButton').onclick=settings;$('sceneButton').onclick=scenes;$('randomButton').onclick=()=>perform(pick(A).id);$('closeSheet').onclick=closeSheet;$('veil').addEventListener('click',e=>{if(e.target===$('veil'))closeSheet()});
+$('chatForm').onsubmit=e=>{e.preventDefault();chat($('chatInput').value);$('chatInput').value=''};$('journalButton').onclick=journal;$('settingsButton').onclick=settings;$('sceneButton').onclick=scenes;$('randomButton').onclick=()=>perform(pick(A.filter(a=>a.id!=='tie'||isShirtOutfit())).id);$('closeSheet').onclick=closeSheet;$('veil').addEventListener('click',e=>{if(e.target===$('veil'))closeSheet()});
 document.addEventListener('keydown',e=>{if($('veil').hidden)return;if(e.key==='Escape'){closeSheet();return}if(e.key==='Tab'){const nodes=[...$('sheet').querySelectorAll('button:not(:disabled),input,textarea,[tabindex="0"]')].filter(n=>n.offsetParent!==null);const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){last.focus();e.preventDefault()}else if(!e.shiftKey&&document.activeElement===last){first.focus();e.preventDefault()}}});
 let pointer=null,holdTimer=0,lastTap=0;
 $('actorWrap').addEventListener('pointerdown',e=>{if(pointer||e.isPrimary===false)return;pointer={id:e.pointerId,x:e.clientX,y:e.clientY,hold:false};$('actorWrap').setPointerCapture(e.pointerId);holdTimer=setTimeout(()=>{if(pointer){pointer.hold=true;perform('hug')}},650)});
@@ -363,13 +378,13 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){checkDate
 setOutfitInitial();applyScene(state.scene);render();rest();persist();if(state.total>0)say('来啦，uu宝宝。今天过得怎么样？');
 // 供本地验收和模型对话联动使用。
 let lastBlushAt=0;
-window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';playAction(id,byId[id]||{cat:'对话',label:'看向你',emoji:''});say(text)},showAIReply(reply,action,move=true){lastInteraction=Date.now();state.chats++;if(move){if(action==='blush'){if(Date.now()-lastBlushAt>45000){lastBlushAt=Date.now();playAction('blush',{cat:'对话',label:'有点心动',emoji:''})}else playAction('shy',{cat:'对话',label:'有点不好意思',emoji:''})}else if(REACTIONS[action])playAction(action,byId[action]||{cat:'对话',label:'听你说',emoji:''});else if(action!=='none'&&byId[action])playAction(action,byId[action]);else playAction('listen',{cat:'对话',label:'听你说',emoji:''})}say(reply);delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()},get state(){return state},actions:A,perform,openGame,closeSheet,chat,clean,get pose(){return currentPose},get gameTimers(){return gameTimers.length},plans:PLANS,atlas:ATLAS,get activeAction(){return activeAction},get currentFrame(){return currentFrame},get frameHistory(){return [...frameHistory]},get reactionHistory(){return reactionHistory.map(x=>({...x}))},get residualEmotion(){return residualEmotion},get motionTimers(){return frameTimers.length},get turnReady(){return spriteAssetReady(spriteSource(36))},get wardrobeReady(){return wardrobeReady},wardrobeFrames:OUTFIT_FRAMES,spriteSource,loadSpriteImage,actionUrls,get pendingAction(){return pendingActionId},rest};
+window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';playAction(id,byId[id]||{cat:'对话',label:'看向你',emoji:''});say(text)},showAIReply(reply,action,move=true){lastInteraction=Date.now();state.chats++;if(move){if(action==='blush'){if(Date.now()-lastBlushAt>45000){lastBlushAt=Date.now();playAction('blush',{cat:'对话',label:'有点心动',emoji:''})}else playAction('shy',{cat:'对话',label:'有点不好意思',emoji:''})}else if(REACTIONS[action])playAction(action,byId[action]||{cat:'对话',label:'听你说',emoji:''});else if(action!=='none'&&byId[action])playAction(action,byId[action]);else playAction('listen',{cat:'对话',label:'听你说',emoji:''})}say(reply);delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()},get state(){return state},actions:A,perform,openGame,closeSheet,chat,clean,get pose(){return currentPose},get gameTimers(){return gameTimers.length},plans:PLANS,atlas:ATLAS,get activeAction(){return activeAction},get currentFrame(){return currentFrame},get frameHistory(){return [...frameHistory]},get reactionHistory(){return reactionHistory.map(x=>({...x}))},get residualEmotion(){return residualEmotion},get motionTimers(){return frameTimers.length},get turnReady(){return spriteAssetReady(spriteSource(36))},get wardrobeReady(){return spriteAssetReady(wardrobePortraitSource())},wardrobeFrames:OUTFIT_FRAMES,spriteSource,loadSpriteImage,actionUrls,get pendingAction(){return pendingActionId},rest};
 </script>
-<script src="chat-config.js?v=8.4"></script>
-<script src="chat-client.js?v=8.4"></script>
-<script src="photo-client.js?v=8.4"></script>
-<script src="proactive.js?v=8.4"></script>
-<script src="wechat-settings.js?v=8.4"></script>
-<script src="about.js?v=8.4"></script>
+<script src="chat-config.js?v=8.5"></script>
+<script src="chat-client.js?v=8.5"></script>
+<script src="photo-client.js?v=8.5"></script>
+<script src="proactive.js?v=8.5"></script>
+<script src="wechat-settings.js?v=8.5"></script>
+<script src="about.js?v=8.5"></script>
 </body>
 </html>

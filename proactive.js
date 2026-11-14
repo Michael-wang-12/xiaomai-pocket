@@ -7,7 +7,7 @@
   rain:[['这阵雨听着挺舒服。陪你待一会儿。','company'],['雨还在下，我们先不赶路。','listen']],
   night:[['这会儿安安静静的，正好陪你坐会儿。','company'],['今晚的星星，先分你一半。','shy']],
   sunset:[['这会儿的光刚刚好。一起发个呆？','company'],['有点舍不得这片晚霞，你呢？','listen']],
-  scarf:[['围巾还暖着呢。你也别着凉。','shy']],cap:[['这顶帽子怎么样？我觉得还挺适合我。','proud']],headphone:[['戴着耳机也听得见你。想说什么就说。','listen']]
+  scarf:[['围巾还暖着呢。你也别着凉。','shy']],cap:[['这顶帽子怎么样？我觉得还挺适合我。','proud']],headphone:[['戴着耳机也听得见你。想说什么就说。','listen']],leather:[['新外套怎么样？先说好，不接受敷衍夸奖。','proud'],['这身皮衣够帅吧？好啦，最想听你夸。','shy']],bomber:[['今天这身很适合出去走走，你觉得呢？','listen'],['这么看着我，是不是又想夸我了？','proud']],blackshirt:[['黑衬衫怎么样？你要是说好看，我可就记住了。','proud']],'blackshirt-tie':[['领带系好了，今天这身够精神吧？','proud']]
  };
  let observedActivity=lastInteraction,nextAt=0,recent=[],count=0;
  function schedule(now=Date.now()){observedActivity=lastInteraction;const m=modes[mode];nextAt=m.min?now+Math.round(m.min+Math.random()*(m.max-m.min)):Infinity}
