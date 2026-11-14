@@ -18,11 +18,21 @@ const XM_WEAR=(()=>{
  const active=state=>[...Object.keys(slots).map(slot=>state.accessories[slot]).filter(Boolean),...(state.outfit==='blackshirt'&&state.accessories.tie?['tie']:[])];
  const bodySource=(frame,outfit)=>'assets/wear-'+outfit+'-'+SHEET_NAMES[sheetIndex(frame)]+(outfit==='trench'?'-v6.png':'-v5.png');
  const overlaySource=(id,frame)=>'assets/overlay-'+id+'-'+SHEET_NAMES[sheetIndex(frame)]+'-v6.png';
- const headSource=(id,frame)=>'assets/wear-'+id+'-'+SHEET_NAMES[sheetIndex(frame)]+(id==='cap'&&sheetIndex(frame)===1?'-v6.png':'-v5.png');
+ function headSource(id,frame,eyes=''){
+  const sheet=SHEET_NAMES[sheetIndex(frame)];
+  if(eyes==='sunglass'){
+   if(id)return 'assets/head-'+id+'-sunglass-'+sheet+'-v1.webp';
+   return 'assets/wear-sunglass-'+sheet+'-v5.png';
+  }
+  return 'assets/wear-'+id+'-'+sheet+(id==='cap'&&sheet==='social'?'-v6.png':'-v5.png');
+ }
  function layers(frame,state,outfit=state.outfit){
   const list=[{id:'body',url:bodySource(frame,body(state,outfit))}];
-  if(state.accessories.head)list.push({id:'head',url:headSource(state.accessories.head,frame)});
-  for(const slot of ['eyes','chest','neck'])if(state.accessories[slot]&&!(slot==='chest'&&frame>=41&&frame<=48)&&!(slot==='eyes'&&frame>=42&&frame<=45))list.push({id:slot,url:overlaySource(state.accessories[slot],frame)});
+  const {head,eyes,chest,neck}=state.accessories;
+  // The replacement portrait already wears its single pair of glasses in this pose.
+  if(head||eyes)list.push({id:'head',url:headSource(head,frame,eyes)});
+  if(chest&&(frame<41||frame>48))list.push({id:'chest',url:overlaySource(chest,frame)});
+  if(neck)list.push({id:'neck',url:overlaySource(neck,frame)});
   return list;
  }
  // Head-only replacement keeps caps/headphones fitted to hair without restoring an old coat.
@@ -49,15 +59,21 @@ const XM_WEAR=(()=>{
  const frontMasks=new Map();
  function frontMask(frame){if(!foreground[frame])return '';if(!frontMasks.has(frame))frontMasks.set(frame,'url("data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'+foreground[frame].map(points=>'<polygon fill="white" points="'+points+'"/>').join('')+'</svg>')+'")');return frontMasks.get(frame)}
  const masks=new Map();
- function headShape(frame){
-  if(masks.has(frame))return masks.get(frame);
+ function headShape(frame,packed=false){
+  const key=packed?frame+52:frame;
+  if(masks.has(key))return masks.get(key);
   const [x,b,w]=heads[frame]||heads[0];
   const points=[[x-w,0],[x+w,0],[x+w,b-12],[x+18,b-5],[x+7,b],[x-7,b],[x-18,b-5],[x-w,b-12]];
-  const polygon='polygon('+points.map(p=>p[0]+'% '+p[1]+'%').join(',')+')';
+  // Packed head cells extend 15% above the body grid so tall hats can fit at the natural eye line.
+  const headPoints=packed?points.map(([x,y])=>[x,(y===0?0:(y+15)/.7)]):points;
+  const polygon='polygon('+headPoints.map(p=>p[0]+'% '+p[1]+'%').join(',')+')';
   const hole='M'+points.map(p=>p.join(' ')).join('L')+'Z';
   const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path fill="white" fill-rule="evenodd" d="M0 0H100V100H0Z'+hole+'"/></svg>';
   const inverse='url("data:image/svg+xml,'+encodeURIComponent(svg)+'")';
-  const value={polygon,inverse};masks.set(frame,value);return value;
+  // Trace the notch in the top of the body. The foreground can use this clip and its prop mask together.
+  const outsidePoints=[[0,0],points[0],...points.slice(1).reverse(),[100,0],[100,100],[0,100]];
+  const outside='polygon('+outsidePoints.map(p=>p[0]+'% '+p[1]+'%').join(',')+')';
+  const value={polygon,inverse,outside};masks.set(key,value);return value;
  }
  function paint(sprite,frame,state,url){
   const turn=frame>=36,n=turn?frame-36:frame%9,cols=turn?4:3;
@@ -65,16 +81,31 @@ const XM_WEAR=(()=>{
   const size=turn?'400% 400%':'300% 300%';
   sprite.style.backgroundImage='none';sprite.style.backgroundSize=size;sprite.style.backgroundPosition=position;
   sprite.dataset.source=url;sprite.dataset.accessories=active(state).join(',');
-  const wanted=layers(frame,state),shape=state.accessories.head?headShape(frame):null,front=(shape||state.accessories.neck)?frontMask(frame):'';
-  if(front)wanted.push({id:'front',url});
+  const wanted=layers(frame,state),head=wanted.find(part=>part.id==='head');
+  const sunglasses=state.accessories.eyes==='sunglass',packed=Boolean(sunglasses&&state.accessories.head);
+  const shape=head?headShape(frame,packed):null,front=(shape||state.accessories.neck)?frontMask(frame):'';
+  if(front){
+   wanted.push({id:'front',url});
+   if(sunglasses&&(state.accessories.neck||state.accessories.chest))wanted.push({id:'front-head',url:head.url});
+  }
   for(const old of [...sprite.children])if(!wanted.some(x=>x.id===old.dataset.layer))old.remove();
   for(const part of wanted){
    let el=sprite.querySelector('[data-layer="'+part.id+'"]');
    if(!el){el=document.createElement('div');el.className='sprite-layer wear-'+part.id;el.dataset.layer=part.id;el.setAttribute('aria-hidden','true');sprite.append(el)}
-   el.style.backgroundImage='url("'+(part.id==='body'?url:part.url)+'")';el.style.backgroundSize=size;el.style.backgroundPosition=position;
-   el.style.clipPath=part.id==='head'?shape.polygon:'';
+   const isHead=part.id==='head'||part.id==='front-head';
+   // The outer prop mask stays in body coordinates. Its portrait child may use a cropped atlas.
+   let art=el;
+   if(part.id==='front-head'){
+    if(!el.firstElementChild){const child=document.createElement('div');child.className='sprite-layer';el.append(child)}
+    art=el.firstElementChild;
+   }
+   art.classList.toggle('packed-head',isHead&&packed);
+   art.style.backgroundImage='url("'+(part.id==='body'?url:part.url)+'")';art.style.backgroundSize=size;art.style.backgroundPosition=position;
+   if(isHead)art.style.clipPath=shape.polygon;
+   else if(part.id==='front'&&sunglasses)el.style.clipPath=shape.outside;
+   else el.style.clipPath='';
    if(part.id==='neck'){const [x,y,sx,sy]=scarfFit[frame];el.style.transformOrigin='0 0';el.style.transform='translate('+x+'%,'+y+'%) scale('+sx+','+sy+')'}
-   const mask=part.id==='front'?front:part.id==='body'&&shape?shape.inverse:'';el.style.maskImage=mask;el.style.webkitMaskImage=mask;
+   const mask=part.id==='front'||part.id==='front-head'?front:part.id==='body'&&shape?shape.inverse:'';el.style.maskImage=mask;el.style.webkitMaskImage=mask;
   }
  }
  return {clothes,slots,empty,normalize,body,active,bodySource,overlaySource,headSource,layers,paint,headShape};

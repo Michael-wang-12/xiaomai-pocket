@@ -53,7 +53,7 @@ header{margin-bottom:12px}h1{font-size:25px}.eyebrow{font-size:9px;letter-spacin
 .clothes-options{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.action.clothes-action{min-width:0;min-height:144px;gap:9px;padding:12px 6px;font-size:11px;font-weight:650}.clothes-preview{display:block;width:100%;max-width:96px;height:auto;aspect-ratio:1;background-size:300% 300%;background-position:0 0;background-repeat:no-repeat;filter:drop-shadow(0 5px 3px #273c3220)}
 .tie-option{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;min-height:48px;padding:12px 15px;border:1px solid var(--line);border-radius:13px;background:#fff}.tie-option[aria-pressed=true]{background:#e3eadb;border-color:#8ba17c}.tie-option small{font-size:11px;color:var(--muted)}
 .wardrobe-tabs{display:flex;gap:4px;padding:4px;margin:2px 0 10px;background:#e7eddf;border:1px solid #d7e0cf;border-radius:14px}.wardrobe-tab{flex:1;min-height:44px;padding:10px 8px;border-radius:10px;background:transparent;font-size:12px;font-weight:650;color:var(--muted)}.wardrobe-tab[aria-selected=true]{background:#fff;color:var(--ink);box-shadow:0 2px 7px #273c3212}
-.sprite{position:relative}.sprite-layer{position:absolute;inset:0;background-repeat:no-repeat;pointer-events:none;mask-size:100% 100%;-webkit-mask-size:100% 100%}.wear-body{z-index:0}.wear-head{z-index:1}.wear-eyes{z-index:2}.wear-chest{z-index:3}.wear-neck{z-index:4}.wear-front{z-index:5}.wearing-label{max-width:calc(100% - 28px);white-space:normal;line-height:1.5;font-size:9px}.accessory-group{grid-column:1/-1}.accessory-heading{font-size:11px;color:var(--muted);margin:9px 1px 8px}.accessory-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.accessory-group .tie-option{width:100%;gap:12px}.tie-option>span{flex-shrink:0}.tie-option small{line-height:1.6;text-align:right}.shared-options{grid-template-columns:repeat(3,minmax(0,1fr))}.tie-option:disabled{opacity:.65}.action.worn:before{content:'已选'}
+.sprite{position:relative;background-image:none}.sprite-layer{position:absolute;inset:0;background-repeat:no-repeat;pointer-events:none;mask-size:100% 100%;-webkit-mask-size:100% 100%}.packed-head{top:-15%;bottom:auto;height:70%}.wear-body{z-index:0}.wear-head{z-index:1}.wear-chest{z-index:3}.wear-neck{z-index:4}.wear-front,.wear-front-head{z-index:5}.wearing-label{max-width:calc(100% - 28px);white-space:normal;line-height:1.5;font-size:9px}.accessory-group{grid-column:1/-1}.accessory-heading{font-size:11px;color:var(--muted);margin:9px 1px 8px}.accessory-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.accessory-group .tie-option{width:100%;gap:12px}.tie-option>span{flex-shrink:0}.tie-option small{line-height:1.6;text-align:right}.shared-options{grid-template-columns:repeat(3,minmax(0,1fr))}.tie-option:disabled{opacity:.65}.action.worn:before{content:'已选'}
 </style>
 </head>
 <body>
@@ -68,7 +68,7 @@ header{margin-bottom:12px}h1{font-size:25px}.eyebrow{font-size:9px;letter-spacin
 <aside class="composer" id="composer" aria-label="和小麦聊天"><div class="reply-peek" id="replyPeek">我在。想聊什么，随时说。</div><div class="model-controls" id="modelControls" hidden><span>GPT-6.1 Terra</span><div role="group" aria-label="推理强度"><span class="reasoning-label">推理</span><button type="button" data-effort="low" aria-pressed="false">低</button><button type="button" data-effort="medium" aria-pressed="true">中</button><button type="button" data-effort="high" aria-pressed="false">高</button></div></div><form class="chat" id="chatForm"><input id="chatInput" aria-label="对小麦说句话" maxlength="120" placeholder="和小麦说句话…" autocomplete="off"><button class="send" type="submit" aria-label="发送">↑</button></form><div class="foot"><span id="chatMode">本机趣味对话</span><button type="button" class="history-link" id="chatHistoryButton">聊天记录</button><span id="saveLabel">正在准备小口袋</span></div></aside>
 <div class="toast" id="toast" role="status" hidden></div>
 <div class="veil" id="veil" hidden><section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="sheet-top"><h2 id="sheetTitle"></h2><button class="close" id="closeSheet" aria-label="关闭弹窗">×</button></div><div id="sheetBody"></div></section></div>
-<script src="wardrobe.js?v=8.6"></script>
+<script src="wardrobe.js?v=8.6.1"></script>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), pick=a=>a[Math.floor(Math.random()*a.length)], today=()=>{const d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}, clamp=n=>Math.max(0,Math.min(100,n));
@@ -280,7 +280,7 @@ $('chatInput').addEventListener('focus',()=>{document.body.classList.add('typing
 // 点发送时保留输入焦点，避免键盘收起后按钮移动，吞掉这一次点击。
 document.querySelector('#chatForm .send').addEventListener('pointerdown',e=>{if(document.activeElement===$('chatInput'))e.preventDefault()});
 if(window.ResizeObserver)new ResizeObserver(entries=>{document.documentElement.style.setProperty('--composer-space',Math.ceil(entries[0].contentRect.height+30)+'px')}).observe($('composer'));
-loadSpriteImage(spriteSource(0)).then(()=>{$('imageLoading').hidden=true}).catch(()=>{$('imageLoading').textContent='形象加载未完成，请刷新试试'});
+Promise.all(frameUrls(0).map(loadSpriteImage)).then(()=>{$('imageLoading').hidden=true}).catch(()=>{$('imageLoading').textContent='形象加载未完成，请刷新试试'});
 
 
 function particles(emoji='✨',n=7){if(state.reduced)n=1;for(let i=0;i<n;i++){const el=document.createElement('span');el.className='particle';el.textContent=emoji;el.style.left=(30+Math.random()*40)+'%';el.style.top=(36+Math.random()*24)+'%';el.style.setProperty('--dx',(Math.random()*160-80)+'px');el.style.setProperty('--r',(Math.random()*80-40)+'deg');el.style.animationDelay=(i*.055)+'s';$('particles').append(el);setTimeout(()=>el.remove(),1900)}}
@@ -372,6 +372,6 @@ window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';pl
 <script src="photo-client.js?v=8.6"></script>
 <script src="proactive.js?v=8.6"></script>
 <script src="wechat-settings.js?v=8.6"></script>
-<script src="about.js?v=8.6"></script>
+<script src="about.js?v=8.6.1"></script>
 </body>
 </html>
