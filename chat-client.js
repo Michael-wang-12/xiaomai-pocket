@@ -10,7 +10,7 @@
   try{const saved=JSON.parse(localStorage.getItem(exampleKey)||'[]');if(Array.isArray(saved))examples=saved.filter(x=>x&&typeof x.id==='string'&&typeof x.prompt==='string'&&x.prompt.length<=200&&typeof x.original==='string'&&x.original.length<=400&&typeof x.preferred==='string'&&x.preferred.trim()&&x.preferred.length<=400).slice(-6)}catch{}
   try{const saved=localStorage.getItem('xiaomai-reasoning');if(['low','medium','high'].includes(saved))effort=saved;const r=localStorage.getItem(retentionKey);if(limits.has(r))retention=r}catch{}
   try{const shared=new URLSearchParams(location.hash.slice(1)).get('pocket');if(shared&&/^[\w-]{32,128}$/.test(shared))sessionStorage.setItem('xiaomai-chat-access',shared);access=sessionStorage.getItem('xiaomai-chat-access')||''}catch{}
-  const online=Boolean(endpoint&&access),chatKey='xiaomai-conversations-v1-'+(online?'smart':'preset');
+  const online=Boolean(endpoint&&access),chatKey='xiaomai-conversations-v1-smart';
   function prune(){const cutoff=retention==='forever'||retention==='off'?0:Date.now()-Number(retention)*86400000;entries=entries.filter(x=>x.at>=cutoff).slice(-200)}
   try{
     if(retention!=='off'){
@@ -38,7 +38,7 @@
   function pairs(){prune();const users=new Map(entries.filter(x=>x.role==='user').map(x=>[x.id,x])),used=new Set(),result=[];for(const e of entries){const u=users.get(e.replyTo);if(e.role==='assistant'&&u&&!used.has(u.id)){result.push({role:'user',content:(u.photo?'[这条消息附带过照片，历史记录不含原图。] ':'')+u.text},{role:'assistant',content:e.text});used.add(u.id)}}return result.slice(-12)}
   function refreshEffort(){document.querySelectorAll('[data-effort]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.effort===effort));b.disabled=busy});$('modelControls').hidden=!online}
   $('modelControls').onclick=e=>{const b=e.target.closest('[data-effort]');if(!b||busy)return;effort=b.dataset.effort;try{localStorage.setItem('xiaomai-reasoning',effort)}catch{}refreshEffort();window.XM_SYNC?.changed()};
-  function setBusy(value){busy=value;send.disabled=value;memoryButton.disabled=value;send.textContent=value?'…':'↑';send.setAttribute('aria-label',value?'小麦正在思考':'发送');form.setAttribute('aria-busy',String(value));mode.textContent=value?'小麦正在认真想…':online?'智能对话 · OpenAI':'本机趣味对话';refreshEffort();updateMemoryButton()}
+  function setBusy(value){busy=value;send.disabled=value;memoryButton.disabled=value;send.textContent=value?'…':'↑';send.setAttribute('aria-label',value?'小麦正在思考':'发送');form.setAttribute('aria-busy',String(value));mode.textContent=value?'小麦正在认真想…':online?'智能对话 · OpenAI':'预设对话';refreshEffort();updateMemoryButton()}
   function add(role,text,extra={}){const entry={id:uid(),role,text,at:Date.now(),...extra};if(retention==='off'||sessionOnly.has(entry.replyTo))sessionOnly.add(entry.id);entries.push(entry);saveConversation();updateMemoryButton();if(dialogKind==='chat-history')renderHistory();return entry}
   function renderPreferences(){
     const box=$('chatPreferences');if(!box)return;box.replaceChildren();
@@ -48,7 +48,7 @@
     for(const e of [...examples].reverse()){const row=document.createElement('div');row.className='expression-example';const p=document.createElement('p');p.textContent='你说：'+e.prompt+'\n希望小麦这样接：'+e.preferred;const b=document.createElement('button');b.type='button';b.textContent='修改';b.onclick=()=>showTeaching(null,e);const d=document.createElement('button');d.type='button';d.textContent='删除';d.onclick=()=>{if(saveExamples(examples.filter(x=>x.id!==e.id)))renderPreferences()};row.append(p,b,d);list.append(row)}
     if(!examples.length){const p=document.createElement('p');p.textContent='在回复上长按，或点「教这句」，留下你认可的接话方式。';list.append(p)}
   }
-  function showPreferences(){openSheet('偏好与说话例句','<p>偏好最多 12 条，例句最多 6 组。'+(online?'用同一专属链接打开，两台手机会同步这些内容。智能聊天时，小麦会参考它们。':'保存在当前浏览器，可随时修改或删除。')+'</p><h3>交流偏好</h3><div id="chatPreferences"></div><button class="primary" id="clearPreferences">忘记全部偏好</button><h3>你教的说话例句</h3><div id="expressionExamples"></div>','chat-preferences');renderPreferences();$('clearPreferences').onclick=()=>{if(savePreferences([],'clearPreferences')){renderPreferences();toast('已忘记全部偏好')}}}
+  function showPreferences(){openSheet('偏好与说话例句','<p>偏好最多 12 条，例句最多 6 组。'+(window.XM_SYNC?.enabled?'所有打开小麦网址的设备共享这些偏好和例句。智能聊天时，小麦会参考它们。':'保存在当前浏览器，可随时修改或删除。')+'</p><h3>交流偏好</h3><div id="chatPreferences"></div><button class="primary" id="clearPreferences">忘记全部偏好</button><h3>你教的说话例句</h3><div id="expressionExamples"></div>','chat-preferences');renderPreferences();$('clearPreferences').onclick=()=>{if(savePreferences([],'clearPreferences')){renderPreferences();toast('已忘记全部偏好')}}}
   function showTeaching(entry,example){
     if(busy){toast('等小麦说完再教这句吧');return}
     if(!entry&&!example)return;
@@ -78,9 +78,9 @@
   function clear(){sequence++;controller?.abort();controller=null;entries=[];sessionOnly.clear();storageProblem='';window.XM_PHOTO?.clear();setBusy(false);saveConversation('clearChat');say('从这句重新开始吧，我听着。');renderHistory();toast('聊天记录已清空')}
   function history(){
     openSheet('和小麦接着聊','<p id="chatPrivacy"></p><p class="small" id="chatSyncStatus" aria-live="polite"></p><label class="retention-setting" for="chatRetention">聊天记录保留<select id="chatRetention"><option value="7">7天</option><option value="30">30天</option><option value="forever">一直保留</option><option value="off">仅本次打开</option></select></label><p id="chatStorageWarning" class="storage-warning" role="status"></p><div id="chatHistory" class="conversation-list" role="log" aria-live="polite"></div><button class="primary" id="clearConversation">清空聊天记录</button>','chat-history');
-    $('chatPrivacy').textContent=(online?'智能回复由 OpenAI 生成。最近六轮完整对话、保存的偏好与例句会随新消息发送。':'当前使用本机预设对话。')+(online?'两台手机通过专属链接共享最近 200 条。选「仅本次打开」会清空云端聊天，新对话只留在当前页面。':'聊天最多保留最近 200 条，保存在当前浏览器。');window.XM_POCKET_APP?.status();
+    $('chatPrivacy').textContent=(online?'智能回复由 OpenAI 生成。最近六轮完整对话、保存的偏好与例句会随新消息发送。':'当前回复使用预设台词。')+(window.XM_SYNC?.enabled?'所有打开小麦网址的设备共享最近 200 条聊天。选「仅本次打开」会清空云端聊天，新对话只留在当前页面。':'聊天最多保留最近 200 条，保存在当前浏览器。');window.XM_POCKET_APP?.status();
     $('chatRetention').value=retention;$('chatRetention').onchange=e=>{const next=e.target.value;try{localStorage.setItem(retentionKey,next);if(next==='off')for(const e of entries)sessionOnly.add(e.id);retention=next;if(!saveConversation('retention'))return;renderHistory();toast(next==='off'?'聊天仅保留在本次打开期间':'已更新聊天保留时间')}catch{toast('保留设置没能保存，请稍后再试')}};
-    $('clearConversation').onclick=()=>{if(confirm(online?'清空 UU 所有设备和云端的聊天记录？已教的偏好和例句会保留。':'清空本浏览器的聊天记录？已教的偏好和例句会保留。'))clear()};renderHistory();
+    $('clearConversation').onclick=()=>{if(confirm(window.XM_SYNC?.enabled?'清空所有设备和云端的聊天记录？已教的偏好和例句会保留。':'清空本浏览器的聊天记录？已教的偏好和例句会保留。'))clear()};renderHistory();
   }
   memoryButton.onclick=showPreferences;teachButton.onclick=()=>showTeaching(lastReply());
   // The compact reply always teaches the latest completed message.

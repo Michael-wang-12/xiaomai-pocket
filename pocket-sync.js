@@ -1,18 +1,13 @@
-// UU's link already carries the shared pocket key in its fragment.
+// All devices visiting this site share the same pocket.
 (() => {
   'use strict';
   const app = window.XM_POCKET_APP;
   const prefix = 'xiaomai-pocket-sync-v1.';
   const headKey = prefix + 'head', flightKey = prefix + 'sending', rowPrefix = prefix + 'edit.';
-  const tokenPattern = /^[\w-]{32,128}$/;
-  const tokenFromLink = new URLSearchParams(location.hash.slice(1)).get('pocket');
-  let access = tokenPattern.test(tokenFromLink || '') ? tokenFromLink : '';
-  if (!access) {
-    try { access = sessionStorage.getItem('xiaomai-chat-access') || ''; } catch {}
-  }
+  const presetKey = 'xiaomai-conversations-v1-preset';
   const endpoint = window.XIAOMAI_CHAT_CONFIG?.endpoint;
-  const enabled = Boolean(app && endpoint && tokenPattern.test(access));
-  let status = enabled ? '正在查看云端记录…' : '用 UU 的专属链接开启设备同步';
+  const enabled = Boolean(app && endpoint);
+  let status = enabled ? '正在查看云端记录…' : '当前页面未连接云端同步';
   const notify = text => {
     if (text === status) return;
     status = text;
@@ -152,6 +147,54 @@
     if (reason === 'clearPreferences') changes.clearPreferences = true;
     return changes;
   }
+  function finishPreset(removeSource, result) {
+    metadata = {...(get(headKey) || metadata), presetImported:true};
+    if (result) {
+      metadata.revision = result.revision;
+      metadata.epoch = result.messageEpoch;
+    }
+    put(headKey, metadata);
+    if (removeSource) drop(presetKey);
+  }
+  async function migratePreset(result) {
+    if ((get(headKey) || metadata).presetImported) return result;
+    const archive = get(presetKey);
+    if (archive?.version !== 1 || !Array.isArray(archive.entries)) {
+      finishPreset(false);
+      return result;
+    }
+    // A preset-only browser used a different local archive before public sync.
+    // Check the current cloud generation before transmitting any old messages.
+    if (result.messageEpoch !== 0 || result.snapshot.retention === 'off' || local.retention === 'off') {
+      finishPreset(true);
+      return result;
+    }
+    const now = Date.now(), day = 86400000;
+    const cutoff = ['7','30'].includes(local.retention) ? now - Number(local.retention) * day : 0;
+    const byId = new Map();
+    for (const item of archive.entries) {
+      if (!item || typeof item.id !== 'string' || !item.id.trim() || item.id.length > 80 ||
+        !['user','assistant','notice'].includes(item.role) || typeof item.text !== 'string' ||
+        !item.text.trim() || item.text.length > 800 || !Number.isSafeInteger(item.at) ||
+        item.at <= 0 || item.at < cutoff || item.at > now + day) continue;
+      const entry = {id:item.id,role:item.role,text:item.text,at:item.at};
+      if (typeof item.replyTo === 'string' && item.replyTo.trim() && item.replyTo.length <= 80) entry.replyTo = item.replyTo;
+      for (const flag of ['photo','edited','spontaneous']) if (item[flag] === true) entry[flag] = true;
+      byId.set(entry.id,entry);
+    }
+    const cloud = new Map(result.snapshot.entries.map(item => [item.id,item]));
+    const entries = [...byId.values()].filter(item => {
+      const saved = cloud.get(item.id);
+      return !saved || (item.role === 'assistant' && saved.role === 'assistant' && item.edited && !saved.edited);
+    }).sort((a,b) => a.at - b.at || a.id.localeCompare(b.id)).slice(-200);
+    if (entries.length) {
+      // Keep the main device's acknowledgements intact when it already synced in v8.7.
+      const imported = await request({device:'preset_' + metadata.device,seq:1,baseRev:0,messageEpoch:0,baseline:{entries}});
+      result = {...imported, ack:result.ack};
+    }
+    finishPreset(true, result);
+    return result;
+  }
   function scrubMessages(row) {
     let modified = false;
     for (const group of ['baseline','changes']) {
@@ -165,6 +208,7 @@
     local = next;
     if (!Object.keys(changes).length) return false;
     if (changes.clearChat) {
+      finishPreset(true);
       // A chat clear or "this session only" also removes plaintext from offline batches.
       for (const key of rowKeys()) {
         const row = get(key);
@@ -245,7 +289,7 @@
       const data = JSON.stringify(body);
       const res = await fetch(new URL('pocket-sync', endpoint).href, {
         method:'POST', mode:'cors', credentials:'omit', redirect:'error', cache:'no-store', referrerPolicy:'no-referrer',
-        headers:{'Content-Type':'application/json','X-Xiaomai-Access':access}, body:data,
+        headers:{'Content-Type':'application/json'}, body:data,
         keepalive:document.hidden && new Blob([data]).size < 55000, signal:controller.signal
       });
       if (!res.ok) throw Object.assign(new Error('sync refused'), {http:res.status});
@@ -273,7 +317,11 @@
       // Changes made while fetch was running are already in the journal. An
       // explicit sample also catches a save made immediately before the response.
       capture();
-      if (!rowKeys().length) break;
+      if (!rowKeys().length) {
+        result = await migratePreset(result);
+        capture();
+        if (!rowKeys().length) break;
+      }
     }
     if (rowKeys().length) return false;
     if (result && (appliedRevision !== result.revision || screenEpoch !== result.messageEpoch)) {
@@ -328,7 +376,7 @@
       schedule(Date.now() - lastActivity < 300000 ? 25000 : 180000);
       return true;
     }).catch(error => {
-      if (error.http === 401 || error.http === 403) {notify('请用 UU 的原专属链接重新打开，再同步记录'); return false;}
+      if (error.http === 401 || error.http === 403) {notify('同步服务暂未接受请求，请稍后再试'); return false;}
       notify(storageLimited ? '本机暂存空间不足，请保持页面打开并重试' :
         rowKeys().length ? '云端暂未连上，新记录在本机等待重试' : '云端暂未连上，可以稍后重试');
       schedule(retryDelay); retryDelay = Math.min(60000, retryDelay * 2);

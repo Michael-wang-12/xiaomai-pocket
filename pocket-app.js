@@ -35,19 +35,20 @@
     const sync=window.XM_SYNC;
     for(const id of ['pocketSyncStatus','chatSyncStatus']){
       const el=$(id);if(!el)continue;
-      const message=sync?.enabled?sync.status:(id==='pocketSyncStatus'?'用 UU 的原专属链接打开，即可在两台手机间同步。':'');
+      const message=sync?.status||'云端暂时未连接，请稍后重试。';
       if(el.textContent!==message)el.textContent=message;
     }
   }
   function mount(){
     const box=$('syncSettings');if(!box)return;
     box.innerHTML='<div class="about-entry"><div><strong>设备同步</strong><small id="pocketSyncStatus" role="status" aria-live="polite"></small></div><button id="pocketSyncNow" type="button">立即同步</button></div>';
-    const sync=window.XM_SYNC,button=$('pocketSyncNow');button.hidden=!sync?.enabled;
-    if(sync?.enabled){
-      const note=document.createElement('p');
-      note.textContent='两台手机共用这一份口袋。持有完整专属链接的人可以查看和更改聊天、偏好和互动进度。';
-      box.append(note);button.onclick=()=>sync.refresh();
-    }
+    const note=document.createElement('p');
+    note.textContent='手机、平板和电脑打开小麦就会自动同步，设备数量不限。能打开这个网址的人都能查看和更改共享记录。';
+    box.append(note);
+    $('pocketSyncNow').onclick=()=>{
+      if(window.XM_SYNC?.enabled)return window.XM_SYNC.refresh();
+      $('pocketSyncStatus').textContent='云端暂时未连接，请联网后刷新页面再试。';
+    };
     updateStatus();
   }
   window.XM_POCKET_APP={read,apply,mount,status:updateStatus,legacyGame:Boolean(initial&&initial.version===1),legacyLast:initial?.last,legacySettings};
