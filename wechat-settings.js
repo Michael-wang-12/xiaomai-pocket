@@ -21,11 +21,6 @@
       if(!ticket&&last===previous)localStorage.removeItem(sessionKey);
     }catch{}
   }
-  function access(){
-    const hash=new URLSearchParams(location.hash.slice(1)).get('pocket');
-    if(hash&&/^[\w-]{32,128}$/.test(hash))return hash;
-    try{return sessionStorage.getItem('xiaomai-chat-access')||''}catch{return ''}
-  }
   function open(){return Boolean($('wechatBinding')&&!$('veil').hidden)}
   function foreground(){return open()&&document.visibilityState!=='hidden'}
   function interrupt(){
@@ -89,18 +84,17 @@
       $('wechatPin').value='';$('wechatPinSend').disabled=false;return;
     }
     const messages={
-      idle:'准备好后再获取二维码，使用 UU 自己的微信确认。',
+      idle:'准备好后点「获取二维码」。首次在微信确认的账号会绑定到小麦，请用 UU 自己的微信操作。',
       expired:'这次绑定码已过期。准备好后可以重新获取。',
       pin_blocked:'这次配对数字已失效，请获取新的绑定码。',
       existing:'微信提示已有绑定，本次没有返回新的授权。可在微信 ClawBot 中查看原来的连接。',
-      bound:'UU 的微信授权已保存。微信消息由小麦的独立接入服务在运行时收发。'
+      bound:'微信授权已保存。微信消息由小麦的独立接入服务在运行时收发。'
     };
     if(!Object.hasOwn(messages,stage))throw Error('invalid_wechat_response');
     remember('');status(messages[stage]);
     if(stage!=='bound')renew(stage==='idle'?'获取二维码':'重新获取二维码');
   }
   const errors={
-    access_required:'请用发给 UU 的原专属链接打开小麦，再连接微信。',
     binding_storage_unavailable:'暂时连不上保存微信授权的服务，请稍后重试。',
     binding_not_configured:'微信绑定服务暂时无法使用，请稍后重试。',
     wechat_unavailable:'暂时连不上微信，可以稍后重试。',
@@ -114,8 +108,6 @@
     clearTimeout(timer);
     const current=++revision,request=new AbortController();
     controller=request;
-    const secret=access();
-    if(!secret){controller=null;clearCode();$('wechatGet').hidden=true;$('wechatRetry').hidden=true;status(errors.access_required);return}
     if(action==='start'){
       clearCode();$('wechatPinBox').hidden=true;$('wechatRetry').hidden=true;
       $('wechatGet').hidden=false;$('wechatGet').disabled=true;status('正在向微信获取新二维码…');
@@ -124,7 +116,7 @@
     try{
       const url=new URL('wechat-bind',window.XIAOMAI_CHAT_CONFIG.endpoint);
       const body={action};if(ticket&&action!=='start')body.session=ticket;if(pin)body.pin=pin;
-      const res=await fetch(url.href,{method:'POST',headers:{'Content-Type':'application/json','X-Xiaomai-Access':secret},credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer',body:JSON.stringify(body),signal:request.signal});
+      const res=await fetch(url.href,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'omit',redirect:'error',cache:'no-store',referrerPolicy:'no-referrer',body:JSON.stringify(body),signal:request.signal});
       const data=await res.json();
       if(current!==revision||!open())return;
       if(!res.ok)throw Error(data.error||'binding_unavailable');
@@ -133,7 +125,6 @@
     }catch(error){
       if(current!==revision||!open())return;
       status(errors[error.message]||'这次没能取得微信状态，请点一下重试。');
-      if(error.message==='access_required'){clearCode();$('wechatGet').hidden=true;$('wechatRetry').hidden=true;return}
       if(pin){$('wechatPinSend').disabled=false;return}
       if(ticket){
         $('wechatRetry').hidden=false;
