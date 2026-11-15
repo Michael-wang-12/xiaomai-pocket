@@ -106,6 +106,7 @@
   function showBound(){
     write('wechatStatus',account?.relay==='expired'?'云端已保存这次微信绑定。':'微信已连接，授权已保存。');
     $('wechatService').hidden=false;
+    $('wechatHistoryHelp').hidden=false;
     write('wechatService',relayMessages[account?.relay]||relayMessages.unknown);
     if(account?.relay==='expired')renew('获取二维码重新授权');
     else $('wechatGet').hidden=true;
@@ -139,6 +140,7 @@
     if(data.renewal)renewing=true;
     stage=data.status;
     $('wechatService').hidden=stage!=='bound';
+    $('wechatHistoryHelp').hidden=stage!=='bound';
     if(stage==='waiting'&&previous==='scanned'&&action==='poll')stage='scanned';
     $('wechatPinBox').hidden=stage!=='pin';
     $('wechatRetry').hidden=true;$('wechatGet').hidden=true;
@@ -226,10 +228,11 @@
   }
   function guide(){
     leave();ticket=readTicket();stage='loading';visibleUntil=0;retries=0;renewing=false;
-    openSheet('连接微信','<div class="wechat-bind" id="wechatBinding"><p id="wechatStatus" role="status" aria-live="polite">正在查看微信连接…</p><p id="wechatService" role="status" hidden></p><img id="wechatQR" class="wechat-qr" alt="小麦的微信 ClawBot 临时绑定二维码" width="320" height="320" hidden><a class="wechat-link" id="wechatOfficial" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" hidden>打开微信官方绑定入口</a><button type="button" class="wechat-main" id="wechatGet" hidden>获取二维码</button><div id="wechatPinBox" hidden><label>微信配对数字<input id="wechatPin" inputmode="numeric" autocomplete="one-time-code" maxlength="12" pattern="[0-9]{4,12}"></label><button type="button" class="wechat-main" id="wechatPinSend">提交配对数字</button></div><button type="button" class="wechat-secondary" id="wechatRetry" hidden>重新查询绑定状态</button><button type="button" class="wechat-secondary" id="wechatBack">返回设置</button></div>','wechat-bind');
+    openSheet('连接微信','<div class="wechat-bind" id="wechatBinding"><p id="wechatStatus" role="status" aria-live="polite">正在查看微信连接…</p><p id="wechatService" role="status" hidden></p><div id="wechatHistoryHelp" hidden><p>在微信发「查看聊天记录」，可以接着看网页和微信的对话。给好友捎话时，让小麦写好正文，再长按回复转发。</p><button type="button" class="wechat-secondary" id="wechatHistory">查看聊天记录</button></div><img id="wechatQR" class="wechat-qr" alt="小麦的微信 ClawBot 临时绑定二维码" width="320" height="320" hidden><a class="wechat-link" id="wechatOfficial" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" hidden>打开微信官方绑定入口</a><button type="button" class="wechat-main" id="wechatGet" hidden>获取二维码</button><div id="wechatPinBox" hidden><label>微信配对数字<input id="wechatPin" inputmode="numeric" autocomplete="one-time-code" maxlength="12" pattern="[0-9]{4,12}"></label><button type="button" class="wechat-main" id="wechatPinSend">提交配对数字</button></div><button type="button" class="wechat-secondary" id="wechatRetry" hidden>重新查询绑定状态</button><button type="button" class="wechat-secondary" id="wechatBack">返回设置</button></div>','wechat-bind');
     $('wechatGet').onclick=()=>run('start');
     $('wechatRetry').onclick=()=>{retries=0;run(ticket?'poll':'view')};
     $('wechatBack').onclick=settings;
+    $('wechatHistory').onclick=()=>window.XM_AI?.history();
     const submit=()=>{const pin=$('wechatPin').value.trim();if(!/^\d{4,12}$/.test(pin)){status(errors.invalid_pin);$('wechatPin').focus();return}$('wechatPin').value='';run('poll',pin)};
     $('wechatPinSend').onclick=submit;
     $('wechatPin').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();submit()}};

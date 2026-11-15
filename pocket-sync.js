@@ -78,7 +78,8 @@
     if (s.retention === 'off') privateIds = new Set(messages.map(item => item.id));
     else if (privateIds.size) privateIds = new Set(messages.filter(item => privateIds.has(item.id)).map(item => item.id));
     const entries = messages.filter(item => s.retention !== 'off' && !privateIds.has(item.id)).map(item => {
-      const e = {id:item.id, role:item.role, at:item.at, text:item.text};
+      const e = {id:item.id, role:item.role, at:item.at, text:item.text, source:item.source==='wechat'?'wechat':'web'};
+      if (e.source==='wechat' && item.timeUnknown===true) e.timeUnknown=true;
       if (item.replyTo) e.replyTo = item.replyTo;
       for (const flag of ['photo', 'edited', 'spontaneous']) if (item[flag] === true) e[flag] = true;
       return e;
@@ -177,7 +178,7 @@
         !['user','assistant','notice'].includes(item.role) || typeof item.text !== 'string' ||
         !item.text.trim() || item.text.length > 800 || !Number.isSafeInteger(item.at) ||
         item.at <= 0 || item.at < cutoff || item.at > now + day) continue;
-      const entry = {id:item.id,role:item.role,text:item.text,at:item.at};
+      const entry = {id:item.id,role:item.role,text:item.text,at:item.at,source:'web'};
       if (typeof item.replyTo === 'string' && item.replyTo.trim() && item.replyTo.length <= 80) entry.replyTo = item.replyTo;
       for (const flag of ['photo','edited','spontaneous']) if (item[flag] === true) entry[flag] = true;
       byId.set(entry.id,entry);
@@ -373,7 +374,8 @@
       if (!done) {notify('有记录等待同步…'); schedule(1000); return false;}
       const clock = new Date().toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit',hour12:false});
       notify('已同步 · ' + clock);
-      schedule(Date.now() - lastActivity < 300000 ? 25000 : 180000);
+      const delay = app.historyVisible?.() ? 10000 : Date.now() - lastActivity < 300000 ? 25000 : 180000;
+      schedule(delay);
       return true;
     }).catch(error => {
       if (error.http === 401 || error.http === 403) {notify('同步服务暂未接受请求，请稍后再试'); return false;}

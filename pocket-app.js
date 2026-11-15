@@ -43,7 +43,7 @@
     const box=$('syncSettings');if(!box)return;
     box.innerHTML='<div class="about-entry"><div><strong>设备同步</strong><small id="pocketSyncStatus" role="status" aria-live="polite"></small></div><button id="pocketSyncNow" type="button">立即同步</button></div>';
     const note=document.createElement('p');
-    note.textContent='手机、平板和电脑打开小麦就会自动同步，设备数量不限。能打开这个网址的人都能查看和更改共享记录。';
+    note.textContent='手机、平板和电脑打开小麦会自动同步。能打开这个网址的人都能查看网页和微信的聊天、修改共享记录。';
     box.append(note);
     $('pocketSyncNow').onclick=()=>{
       if(window.XM_SYNC?.enabled)return window.XM_SYNC.refresh();
@@ -51,6 +51,7 @@
     };
     updateStatus();
   }
-  window.XM_POCKET_APP={read,apply,mount,status:updateStatus,legacyGame:Boolean(initial&&initial.version===1),legacyLast:initial?.last,legacySettings};
+  const historyVisible=()=>dialogKind==='chat-history'&&!$('veil').hidden;
+  window.XM_POCKET_APP={read,apply,mount,status:updateStatus,historyVisible,legacyGame:Boolean(initial&&initial.version===1),legacyLast:initial?.last,legacySettings};
   window.addEventListener('xiaomai-sync-status',updateStatus);
 })();
