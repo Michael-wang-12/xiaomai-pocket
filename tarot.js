@@ -1,11 +1,7 @@
 (() => {
   'use strict';
   const chat = window.XIAOMAI_CHAT_CONFIG?.endpoint;
-  const entry = document.createElement('button');
-  entry.type = 'button';
-  entry.className = 'history-link';
-  entry.textContent = '✦ 塔罗';
-  document.querySelector('#chatHistoryButton').before(entry);
+  const entry = document.querySelector('#tarotEntry');
 
   const style = document.createElement('style');
   style.textContent = `

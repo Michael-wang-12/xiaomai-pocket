@@ -62,6 +62,7 @@ header{margin-bottom:12px}h1{font-size:25px}.eyebrow{font-size:9px;letter-spacin
 <section class="stats" aria-label="小麦的状态"><div class="stat"><div class="stat-top">心情 <b id="moodValue"></b></div><div class="track"><i id="moodBar"></i></div></div><div class="stat"><div class="stat-top">饱腹 <b id="foodValue"></b></div><div class="track"><i id="foodBar" style="--bar:#bd9e6c"></i></div></div><div class="stat"><div class="stat-top">精力 <b id="energyValue"></b></div><div class="track"><i id="energyBar" style="--bar:#82a5a0"></i></div></div><div class="stat"><div class="stat-top">默契 <b id="bondValue"></b></div><div class="track"><i id="bondBar" style="--bar:#b59b83"></i></div></div></section>
 <section class="room" id="room" aria-label="小麦的小世界"><div class="sun"></div><div class="room-label"><i></i><span id="roomName">山野小憩</span></div><button class="scene-btn" id="sceneButton">换个风景 ↗</button><div class="bubble" id="bubble" aria-live="polite"><b>小麦</b><span id="speech">想你了宝宝。过来挨着我坐。</span></div><div class="floor-shadow"></div><div class="action-effects" id="actionEffects"></div><div class="current-action" id="currentAction" hidden></div><div class="image-loading" id="imageLoading">小麦在整理衣服…</div><div class="leaf">🌿</div><div class="leaf right">🌾</div><div class="actor-wrap" id="actorWrap" role="button" tabindex="0" aria-label="与小麦互动：轻点摸头，长按拥抱，滑动活动"><div class="actor" id="actor"><div class="sprite" id="sprite" role="img" aria-label="黑框眼镜、黑发黑色外套的男生小麦"></div><div class="blush-overlay" aria-hidden="true"><i></i><i></i></div><div class="prop" id="prop"></div></div></div><div class="wearing-label" id="wearingLabel" hidden></div><div class="wardrobe-loading" id="wardrobeLoading" hidden>穿搭准备中…</div><div class="status-badge" id="statusBadge">自在发呆中</div><div class="particles" id="particles"></div><div class="gesture-hint">点点脑袋 · 长按抱抱 · 左右滑动转身</div></section>
 <div class="quick"><button data-action="head">✋ 摸摸头</button><button data-action="rice">🍙 投喂一下</button><button id="randomButton">🎲 随机互动</button></div>
+<button id="tarotEntry" type="button" style="display:flex;align-items:center;gap:12px;width:100%;min-height:54px;padding:10px 15px;margin:0 0 14px;border:1px solid #bbcbb5;border-radius:14px;background:#e6efdf;color:#284736;text-align:left"><span aria-hidden="true" style="background:#375845;color:#f5ddaa;border-radius:9px;padding:5px 9px;font-size:20px">✦</span><strong style="font-size:15px">和小麦抽塔罗</strong><span aria-hidden="true" style="margin-left:auto;font-size:21px">›</span></button>
 <section aria-label="互动百宝箱"><div class="section-heading"><h2>今天，玩点什么？</h2><span class="small" id="progress">60 种小互动</span></div><nav class="tabs" id="tabs" aria-label="互动分类"></nav><div class="wardrobe-tabs" id="wardrobeTabs" role="tablist" aria-label="穿搭选项" hidden></div><p class="wardrobe-note" id="wardrobeNote" hidden></p><div class="actions" id="actions"></div></section>
 
 </main>
@@ -372,10 +373,10 @@ window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';pl
 <script src="photo-client.js?v=8.8"></script>
 <script src="proactive.js?v=8.7"></script>
 <script src="wechat-settings.js?v=8.9"></script>
-<script src="about.js?v=8.10"></script>
+<script src="about.js?v=8.10.1"></script>
 <script src="pocket-app.js?v=8.9"></script>
 <script src="pocket-sync.js?v=8.9"></script>
-<script src="tarot.js?v=1"></script>
+<script src="tarot.js?v=2"></script>
 <script>
 if (new URLSearchParams(location.search).get("view") === "history") window.XM_AI?.history();
 </script>
