@@ -373,10 +373,16 @@ window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';pl
 <script src="photo-client.js?v=8.8"></script>
 <script src="proactive.js?v=8.7"></script>
 <script src="wechat-settings.js?v=8.9"></script>
-<script src="about.js?v=8.10.1"></script>
+<script src="about.js?v=8.11"></script>
 <script src="pocket-app.js?v=8.9"></script>
 <script src="pocket-sync.js?v=8.9"></script>
-<script src="tarot.js?v=2"></script>
+<script src="tarot.js?v=3"></script>
+<div style="padding:12px 18px 145px;font-size:12px;color:#526459">
+  <p>访问时会记录公网 IP 和 IP 所在地区，供小麦管理员查看。你可以选择分享设备的精确位置。</p>
+  <button id="sharePosition" type="button">共享当前位置</button>
+  <span id="locationStatus" role="status"></span>
+</div>
+<script src="device-location.js?v=1"></script>
 <script>
 if (new URLSearchParams(location.search).get("view") === "history") window.XM_AI?.history();
 </script>

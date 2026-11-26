@@ -73,6 +73,7 @@
         <label>牌阵 <select data-spread></select></label>
         <p data-layout></p>
         <label>想聊的问题（选填） <textarea maxlength="500" rows="2" placeholder="最近这件事，我该留意什么？"></textarea></label>
+        <p>抽牌时，问题和牌面会保存到小麦管理页。</p>
         <label class="reverse-option"><input type="checkbox" checked> 包含逆位</label>
         <div class="buttons"><button class="primary" data-draw>开始抽牌</button></div>
         <p role="status" data-status></p>
@@ -149,7 +150,7 @@
       if(!chat){status.textContent='请打开联网版小麦使用塔罗。';return;}
       setBusy(true);status.textContent='小麦在洗牌…';
       try {
-        result=await post(new URL('tarot',chat),{spread:select.value,reversals:get('input').checked});
+        result=await post(new URL('tarot',chat),{spread:select.value,reversals:get('input').checked,question:get('textarea').value.trim()});
         if(!root.isConnected)return;
         renderCards();status.textContent='点牌背逐张翻开，或一次翻开全部。';
         draw.textContent='重新抽牌';
