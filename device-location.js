@@ -106,7 +106,6 @@
     dialog.showModal();
   }
   window.XM_DEVICE_LOCATION={mount};
-  if(new URLSearchParams(location.search).get('view')==='history')return;
   try{promptForLocation();}catch{}
   if(navigator.geolocation){
     void autoUpdate();
