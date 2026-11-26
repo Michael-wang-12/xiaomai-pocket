@@ -88,20 +88,18 @@
     if(preference==='allowed'||preference==='disabled')return;
     const dialog=document.createElement('dialog');
     dialog.setAttribute('aria-labelledby','locationPromptTitle');
+    dialog.className='location-entry';
     dialog.style.cssText='width:min(360px,calc(100% - 32px));box-sizing:border-box;border:1px solid #b7cbbb;border-radius:18px;padding:20px;background:#fffef8;color:#264536;line-height:1.6';
     dialog.innerHTML='<h2 id="locationPromptTitle">位置权限</h2><p>允许小麦在使用期间自动获取并保存你的位置？</p><p role="status"></p><button type="button" class="primary" autofocus>允许</button>';
     if(typeof dialog.showModal!=='function')return;
     const allow=dialog.querySelector('button'),status=dialog.querySelector('[role=status]');
     const remember=()=>{try{if(!localStorage.getItem(promptKey))localStorage.setItem(promptKey,'dismissed');}catch{}};
     dialog.addEventListener('close',()=>{remember();dialog.remove();},{once:true});
-    dialog.addEventListener('click',event=>{
-      if(event.target!==dialog)return;
-      const box=dialog.getBoundingClientRect();
-      if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();
-    });
-    allow.onclick=()=>{
+    dialog.addEventListener('cancel',event=>event.preventDefault());
+    allow.onclick=async()=>{
       remember();
-      locate(allow,status,()=>dialog.close());
+      await locate(allow,status);
+      dialog.close();
     };
     document.body.append(dialog);
     dialog.showModal();
