@@ -137,6 +137,12 @@
   function clear(){sequence++;controller?.abort();controller=null;entries=[];sessionOnly.clear();storageProblem='';window.XM_PHOTO?.clear();setBusy(false);saveConversation('clearChat');say('从这句重新开始吧，我听着。');renderHistory();toast('聊天记录已清空')}
   function history(){
     openSheet('和小麦接着聊','<p id="chatPrivacy"></p><p class="small" id="chatSyncStatus" aria-live="polite"></p><label class="retention-setting" for="chatRetention">聊天记录保留<select id="chatRetention"><option value="7">7天</option><option value="30">30天</option><option value="forever">一直保留</option><option value="off">仅本次打开</option></select></label><p id="chatStorageWarning" class="storage-warning" role="status"></p><div id="chatHistory" class="conversation-list" role="log" aria-live="polite"></div><button class="primary" id="clearConversation">清空聊天记录</button>','chat-history');
+    const settingsLink=document.createElement('button');
+    settingsLink.type='button';
+    settingsLink.className='history-link';
+    settingsLink.textContent='口袋设置';
+    settingsLink.onclick=settings;
+    $('chatPrivacy').before(settingsLink);
     $('chatPrivacy').textContent=(canUseServer()?'小麦的服务器会把新消息、最近六轮完整对话、保存的偏好与例句发给 OpenAI 生成回复。':'当前回复使用预设台词。')+(window.XM_SYNC?.enabled?'所有打开小麦网址的设备都能看到最近 200 条网页和微信对话。选「仅本次打开」会清空云端聊天，新的网页对话只留在当前页面。':'聊天最多保留最近 200 条，保存在当前浏览器。');window.XM_POCKET_APP?.status();
     $('chatRetention').value=retention;$('chatRetention').onchange=e=>{const next=e.target.value;try{localStorage.setItem(retentionKey,next);if(next==='off')for(const e of entries)sessionOnly.add(e.id);retention=next;if(!saveConversation('retention'))return;renderHistory();toast(next==='off'?'聊天仅保留在本次打开期间':'已更新聊天保留时间')}catch{toast('保留设置没能保存，请稍后再试')}};
     const shared=window.XM_SYNC?.enabled;

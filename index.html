@@ -331,7 +331,20 @@ function perform(id){const a=byId[id];if(!a)return;if(id==='tie'&&!isShirtOutfit
 function easter(name,text){if(!state.ach.includes('rainbow'))state.ach.push('rainbow');say(text);particles('🌟',10);toast('彩蛋 · '+name);log('发现彩蛋：'+name)}
 function clearGame(){gameToken++;gameTimers.forEach(clearTimeout);gameTimers=[]}
 function later(fn,ms){const token=gameToken;const t=setTimeout(()=>{if(token===gameToken)fn()},ms);gameTimers.push(t);return t}
-function openSheet(title,html,kind=''){if(dialogKind==='wechat-bind')window.XM_WECHAT?.leave();clearGame();lastFocus=document.activeElement;dialogKind=kind;$('sheetTitle').textContent=title;$('sheetBody').innerHTML=html;$('veil').hidden=false;document.body.classList.add('no-scroll');$('sheet').scrollTop=0;$('closeSheet').focus()}
+function openSheet(title,html,kind=''){
+  if(dialogKind==='wechat-bind')window.XM_WECHAT?.leave();
+  clearGame();
+  if($('veil').hidden)lastFocus=document.activeElement;
+  const body=$('sheetBody');
+  body.onclick=null;
+  dialogKind=kind;
+  $('sheetTitle').textContent=title;
+  body.innerHTML=html;
+  $('veil').hidden=false;
+  document.body.classList.add('no-scroll');
+  $('closeSheet').focus({preventScroll:true});
+  $('sheet').scrollTop=0;
+}
 function closeSheet(){if(dialogKind==='wechat-bind')window.XM_WECHAT?.leave();clearGame();$('veil').hidden=true;document.body.classList.remove('no-scroll');dialogKind='';if(lastFocus&&lastFocus.isConnected)lastFocus.focus();else $('journalButton').focus()}
 function winGame(text){state.gameWins++;delta({mood:5,bond:2});log(text);achievements();render();persist();particles('⭐',8)}
 function gameLayout(text){return `<div class="game-area"><div class="game-note" id="gameNote">${text}</div><div id="gameContent"></div></div>`}
@@ -369,11 +382,11 @@ let lastBlushAt=0;
 window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';playAction(id,byId[id]||{cat:'对话',label:'看向你',emoji:''});say(text)},showAIReply(reply,action,move=true){lastInteraction=Date.now();state.chats++;if(move){if(action==='blush'){if(Date.now()-lastBlushAt>45000){lastBlushAt=Date.now();playAction('blush',{cat:'对话',label:'有点心动',emoji:''})}else playAction('shy',{cat:'对话',label:'有点不好意思',emoji:''})}else if(REACTIONS[action])playAction(action,byId[action]||{cat:'对话',label:'听你说',emoji:''});else if(action!=='none'&&byId[action])playAction(action,byId[action]);else playAction('listen',{cat:'对话',label:'听你说',emoji:''})}say(reply);delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()},get state(){return state},actions:A,perform,openGame,closeSheet,chat,clean,get pose(){return currentPose},get gameTimers(){return gameTimers.length},plans:PLANS,atlas:ATLAS,get activeAction(){return activeAction},get currentFrame(){return currentFrame},get frameHistory(){return [...frameHistory]},get reactionHistory(){return reactionHistory.map(x=>({...x}))},get residualEmotion(){return residualEmotion},get motionTimers(){return frameTimers.length},get turnReady(){return spriteAssetReady(spriteSource(36))},get wardrobeReady(){return frameUrls(0).every(spriteAssetReady)},wardrobeFrames:OUTFIT_FRAMES,spriteSource,frameUrls,lookLabel,loadSpriteImage,actionUrls,get pendingAction(){return pendingActionId},rest};
 </script>
 <script src="chat-config.js?v=8.8"></script>
-<script src="chat-client.js?v=8.9"></script>
+<script src="chat-client.js?v=8.11.2"></script>
 <script src="photo-client.js?v=8.8"></script>
 <script src="proactive.js?v=8.7"></script>
 <script src="wechat-settings.js?v=8.9"></script>
-<script src="about.js?v=8.11.2"></script>
+<script src="about.js?v=8.11.2-r2"></script>
 <script src="pocket-app.js?v=8.9"></script>
 <script src="pocket-sync.js?v=8.9"></script>
 <script src="tarot.js?v=3"></script>
