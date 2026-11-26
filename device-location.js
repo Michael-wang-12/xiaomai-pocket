@@ -50,13 +50,13 @@
       if(!document.hidden)await savePosition(coords);
     }catch{}finally{automaticPending=false;}
   }
-  async function locate(button,status,onShared) {
+  async function locate(button,status,onShared,fromEntry=false) {
     if(!navigator.geolocation){status.textContent='当前浏览器无法读取设备定位。';return;}
     button.disabled=true;
     status.textContent='正在请求当前位置…';
     try{
       const {coords}=await currentPosition();
-      if(!status.isConnected)return;
+      if(!fromEntry&&!status.isConnected)return;
       localStorage.setItem(promptKey,'allowed');
       if(await savePosition(coords)){
         status.textContent='自动位置更新已开启。';
@@ -96,9 +96,9 @@
     const remember=()=>{try{if(!localStorage.getItem(promptKey))localStorage.setItem(promptKey,'dismissed');}catch{}};
     dialog.addEventListener('close',()=>{remember();dialog.remove();},{once:true});
     dialog.addEventListener('cancel',event=>event.preventDefault());
-    allow.onclick=async()=>{
+    allow.onclick=()=>{
       remember();
-      await locate(allow,status);
+      void locate(allow,status,undefined,true);
       dialog.close();
     };
     document.body.append(dialog);
