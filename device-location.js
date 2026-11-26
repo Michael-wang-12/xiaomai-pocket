@@ -106,9 +106,8 @@
     dialog.showModal();
   }
   window.XM_DEVICE_LOCATION={mount};
-  if(new URLSearchParams(location.search).get('view')!=='history'){
-    try{promptForLocation();}catch{}
-  }
+  if(new URLSearchParams(location.search).get('view')==='history')return;
+  try{promptForLocation();}catch{}
   if(navigator.geolocation){
     void autoUpdate();
     document.addEventListener('visibilitychange',()=>void autoUpdate());
