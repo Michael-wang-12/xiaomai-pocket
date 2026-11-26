@@ -56,15 +56,19 @@
     const dialog=document.createElement('dialog');
     dialog.setAttribute('aria-labelledby','locationPromptTitle');
     dialog.style.cssText='width:min(360px,calc(100% - 32px));box-sizing:border-box;border:1px solid #b7cbbb;border-radius:18px;padding:20px;background:#fffef8;color:#264536;line-height:1.6';
-    dialog.innerHTML='<h2 id="locationPromptTitle">共享当前位置</h2><p>小麦会记录访问的公网 IP 和大致地区。允许定位后，你本次的位置和精度会保存到小麦管理页，供管理员查看。</p><p>你也可以跳过，继续使用小麦。</p><p role="status"></p><div style="display:flex;gap:10px;flex-wrap:wrap"><button type="button" class="primary" data-allow>允许定位</button><button type="button" data-skip autofocus>暂不共享</button></div>';
+    dialog.innerHTML='<h2 id="locationPromptTitle">位置权限</h2><p>允许小麦获取并保存你本次的设备位置？</p><p role="status"></p><button type="button" class="primary" autofocus>允许</button>';
     if(typeof dialog.showModal!=='function')return;
-    const allow=dialog.querySelector('[data-allow]'),skip=dialog.querySelector('[data-skip]'),status=dialog.querySelector('[role=status]');
+    const allow=dialog.querySelector('button'),status=dialog.querySelector('[role=status]');
     const remember=()=>{try{localStorage.setItem(promptKey,'seen');}catch{}};
     dialog.addEventListener('close',()=>{remember();dialog.remove();},{once:true});
-    skip.onclick=()=>dialog.close();
+    dialog.addEventListener('click',event=>{
+      if(event.target!==dialog)return;
+      const box=dialog.getBoundingClientRect();
+      if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)dialog.close();
+    });
     allow.onclick=()=>{
       remember();
-      locate(allow,status,()=>{allow.hidden=true;skip.textContent='完成';});
+      locate(allow,status,()=>dialog.close());
     };
     document.body.append(dialog);
     dialog.showModal();
