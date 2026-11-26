@@ -11,8 +11,6 @@
       localStorage.setItem(key,id);
     }
   }catch{return;}
-  const button=document.querySelector('#sharePosition');
-  const status=document.querySelector('#locationStatus');
   function report(position,keepalive=false){
     return fetch(new URL('visit',endpoint),{method:'POST',credentials:'omit',keepalive,
       headers:{'Content-Type':'application/json'},body:JSON.stringify({id,position})})
@@ -24,7 +22,14 @@
       report(undefined,true).then(()=>sessionStorage.setItem(key,String(Date.now()))).catch(()=>{});
     }
   }catch{}
-  button.onclick=()=>{
+  function mount() {
+    const anchor=document.querySelector('#wechatSettings');
+    if(!anchor)return;
+    const section=document.createElement('section');
+    section.innerHTML='<p>访问时会记录公网 IP 和 IP 所在地区，供小麦管理员查看。你可以选择分享设备的精确位置。</p><button type="button" class="primary">共享当前位置</button><p role="status"></p>';
+    anchor.after(section);
+    const button=section.querySelector('button'),status=section.querySelector('[role=status]');
+    button.onclick=()=>{
     if(!navigator.geolocation){status.textContent='当前浏览器无法读取设备定位。';return;}
     button.disabled=true;
     status.textContent='正在请求当前位置…';
@@ -38,5 +43,7 @@
       status.textContent=error.code===1?'未获得位置权限。':'暂时无法读取当前位置，可以重试。';
       button.disabled=false;
     },{enableHighAccuracy:true,maximumAge:0,timeout:15000});
-  };
+    };
+  }
+  window.XM_DEVICE_LOCATION={mount};
 })();
