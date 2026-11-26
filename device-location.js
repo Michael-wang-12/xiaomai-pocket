@@ -77,14 +77,15 @@
     update();
     button.onclick=()=>{
       if(localStorage.getItem(promptKey)==='allowed'){
-        localStorage.setItem(promptKey,'dismissed');
+        localStorage.setItem(promptKey,'disabled');
         status.textContent='已关闭位置自动更新。';
         update();
       }else void locate(button,status,update);
     };
   }
   function promptForLocation(){
-    if(localStorage.getItem(promptKey))return;
+    const preference=localStorage.getItem(promptKey);
+    if(preference==='allowed'||preference==='disabled')return;
     const dialog=document.createElement('dialog');
     dialog.setAttribute('aria-labelledby','locationPromptTitle');
     dialog.style.cssText='width:min(360px,calc(100% - 32px));box-sizing:border-box;border:1px solid #b7cbbb;border-radius:18px;padding:20px;background:#fffef8;color:#264536;line-height:1.6';
