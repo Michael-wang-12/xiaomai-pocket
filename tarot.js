@@ -56,9 +56,9 @@
     if(klass)item.className=klass;
     return item;
   }
-  async function post(url,body) {
+  async function post(url,body,timeout=115000) {
     const controller = new AbortController();
-    const timer = setTimeout(()=>controller.abort(),115000);
+    const timer = setTimeout(()=>controller.abort(),timeout);
     try {
       const response=await fetch(url,{method:'POST',credentials:'omit',redirect:'error',
         headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
@@ -75,12 +75,12 @@
         <label>想聊的问题（选填） <textarea maxlength="500" rows="2" placeholder="最近这件事，我该留意什么？"></textarea></label>
         <p>抽牌时，问题和牌面会保存到小麦管理页。</p>
         <label class="reverse-option"><input type="checkbox" checked> 包含逆位</label>
-        <div class="buttons"><button class="primary" data-draw>开始抽牌</button></div>
+        <div class="buttons"><button type="button" class="primary" data-draw>开始抽牌</button></div>
         <p role="status" data-status></p>
         <div class="table" hidden><div class="deck"></div></div>
         <div class="buttons" data-actions hidden>
-          <button class="secondary" data-reveal>翻开全部</button>
-          <button class="primary" data-read disabled>请小麦解读</button>
+          <button type="button" class="secondary" data-reveal>翻开全部</button>
+          <button type="button" class="primary" data-read disabled>请小麦解读</button>
         </div>
         <div class="card-notes"></div>
         <div class="reading" aria-live="polite" hidden></div>
@@ -150,11 +150,13 @@
       if(!chat){status.textContent='请打开联网版小麦使用塔罗。';return;}
       setBusy(true);status.textContent='小麦在洗牌…';
       try {
-        result=await post(new URL('tarot',chat),{spread:select.value,reversals:get('input').checked,question:get('textarea').value.trim()});
+        result=await post(new URL('tarot',chat),{spread:select.value,reversals:get('input').checked,question:get('textarea').value.trim()},24000);
         if(!root.isConnected)return;
         renderCards();status.textContent='点牌背逐张翻开，或一次翻开全部。';
         draw.textContent='重新抽牌';
-      } catch {status.textContent='这次没能抽到牌，请再试一次。';}
+      } catch(error) {
+        status.textContent=error.name==='AbortError'?'抽牌等候超时，可以重新试一次。':'暂时没能从小麦服务器拿到牌面，请稍后重试。';
+      }
       finally {setBusy(false);}
     };
     reveal.onclick=()=>flips.forEach(f=>f.reveal());

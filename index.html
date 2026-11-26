@@ -382,15 +382,19 @@ let lastBlushAt=0;
 window.XM={showRemark(text,action){const id=REACTIONS[action]?action:'listen';playAction(id,byId[id]||{cat:'对话',label:'看向你',emoji:''});say(text)},showAIReply(reply,action,move=true){lastInteraction=Date.now();state.chats++;if(move){if(action==='blush'){if(Date.now()-lastBlushAt>45000){lastBlushAt=Date.now();playAction('blush',{cat:'对话',label:'有点心动',emoji:''})}else playAction('shy',{cat:'对话',label:'有点不好意思',emoji:''})}else if(REACTIONS[action])playAction(action,byId[action]||{cat:'对话',label:'听你说',emoji:''});else if(action!=='none'&&byId[action])playAction(action,byId[action]);else playAction('listen',{cat:'对话',label:'听你说',emoji:''})}say(reply);delta({mood:2,bond:1});particles('💬',3);beep();achievements();render();persist()},get state(){return state},actions:A,perform,openGame,closeSheet,chat,clean,get pose(){return currentPose},get gameTimers(){return gameTimers.length},plans:PLANS,atlas:ATLAS,get activeAction(){return activeAction},get currentFrame(){return currentFrame},get frameHistory(){return [...frameHistory]},get reactionHistory(){return reactionHistory.map(x=>({...x}))},get residualEmotion(){return residualEmotion},get motionTimers(){return frameTimers.length},get turnReady(){return spriteAssetReady(spriteSource(36))},get wardrobeReady(){return frameUrls(0).every(spriteAssetReady)},wardrobeFrames:OUTFIT_FRAMES,spriteSource,frameUrls,lookLabel,loadSpriteImage,actionUrls,get pendingAction(){return pendingActionId},rest};
 </script>
 <script src="chat-config.js?v=8.8"></script>
-<script src="chat-client.js?v=8.11.2"></script>
+<script src="chat-client.js?v=8.11.6"></script>
 <script src="photo-client.js?v=8.8"></script>
 <script src="proactive.js?v=8.7"></script>
 <script src="wechat-settings.js?v=8.9"></script>
-<script src="about.js?v=8.11.5"></script>
+<script src="about.js?v=8.11.6"></script>
 <script src="pocket-app.js?v=8.9"></script>
 <script src="pocket-sync.js?v=8.9"></script>
-<script src="tarot.js?v=3"></script>
-<style>.location-entry::backdrop{background:#f3f5ec}</style>
+<script src="tarot.js?v=4"></script>
+<style>
+.location-entry::backdrop{background:#f3f5ec}
+.veil,.composer{backdrop-filter:none;-webkit-backdrop-filter:none}
+.no-scroll .room *{animation-play-state:paused!important}
+</style>
 <script src="device-location.js?v=10"></script>
 </body>
 </html>

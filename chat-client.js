@@ -189,7 +189,7 @@
       const data=await readReply(response,partial=>{if(id===sequence){say(partial);mode.textContent='小麦正在说…'}});if(id!==sequence)return false;
       if(typeof data.reply!=='string'||!data.reply.trim()||data.reply.length>800||!actions.has(data.action))throw Error('invalid reply');
       user.pending=false;add('assistant',data.reply,{replyTo:user.id});window.XM.showAIReply(data.reply,data.action,XM.state.total===actionCount);applyMemory(data.memory);return true;
-    }catch(error){if(id!==sequence)return false;user.pending=false;const message=errors[error.code]||'这次没连上小麦的智能对话，请稍后再发一次。你的穿搭和游戏进度都还在。';add('notice',message);say(message);toast(message);return false}
+    }catch(error){if(id!==sequence)return false;user.pending=false;const message=errors[error.code]||'这次没连上小麦的智能对话，请稍后再发一次。你的穿搭和游戏进度都还在。';add('notice',message);if(dialogKind!=='tarot'){say(message);toast(message)}return false}
     finally{clearTimeout(timer);if(id===sequence){controller=null;setBusy(false)}}
   }
   form.onsubmit=e=>{e.preventDefault();if(busy){toast('等小麦说完这一句，再继续聊吧');return}const text=input.value.trim();if(!text)return;input.value='';void chat(text)};
